@@ -19,13 +19,23 @@
  *   automatiquement) — liste des appareils autorisés, par application
  *   (Ventes / Planning). Supprimer une ligne révoque cet appareil.
  *
- * Configuration UNE FOIS après le premier déploiement : dans l'éditeur,
- * icône ⏰ "Déclencheurs" > Ajouter un déclencheur > fonction
- * "rotateAccessCode" > Déclencheur basé sur le temps > Minuteur quotidien.
- * Ça fait tourner automatiquement les deux "codes du jour" (Ventes et
- * Planning, visibles par l'admin dans Réglages) qui servent à enrôler un
- * nouvel appareil — chaque code tourne aussi immédiatement après usage
- * (usage unique), en plus de la rotation quotidienne.
+ * SÉCURITÉ — double authentification (TOTP, compatible Google
+ * Authenticator/Authy) : le "code unique" saisi par un artisan pour
+ * enrôler un nouvel appareil est désormais un code à 6 chiffres qui change
+ * toutes les 30 secondes, calculé à partir d'un secret partagé — exactement
+ * le même principe que la double authentification d'un compte Google.
+ * Aucun code n'est plus stocké ni affiché dans le Sheet ou dans l'appli :
+ * chacun des 3 admins lit le code courant directement dans son appli
+ * Authenticator, sur son téléphone.
+ *
+ * Configuration UNE FOIS après le premier déploiement : exécutez la
+ * fonction "printTotpSetupInfo_" (menu déroulant de fonctions en haut de
+ * l'éditeur > sélectionner > ▶ Exécuter), puis ouvrez Affichage > Journaux
+ * (ou Ctrl/Cmd+Entrée) pour récupérer le secret et l'URL otpauth:// à
+ * scanner (via un générateur de QR code en ligne) ou saisir manuellement
+ * dans Google Authenticator, sur CHACUN des 3 téléphones des admins — une
+ * seule fois. Les 3 appareils affichent alors en permanence le même code,
+ * en même temps.
  *
  * Fichiers de ce projet Apps Script (les 4 doivent être présents ensemble) :
  * - apps-script-classeur-unique.gs (CE fichier) : point d'entrée doGet/doPost, Ventes, Artisans
@@ -162,16 +172,88 @@ function normalizeAppKey_(app) {
   const a = String(app || '').toLowerCase();
   return ACCESS_APPS_.indexOf(a) !== -1 ? a : 'ventes';
 }
-function rotateAccessCode(app) {
-  if (!app) { ACCESS_APPS_.forEach(a => rotateAccessCode(a)); return; }
-  const key = normalizeAppKey_(app);
-  const code = String(Math.floor(100000 + Math.random() * 900000)); // code à 6 chiffres
-  PropertiesService.getScriptProperties().setProperty('ACCESS_DAILY_CODE_' + key.toUpperCase(), code);
-  return code;
+
+/* --- Double authentification TOTP (compatible Google Authenticator) --- */
+const TOTP_SECRET_PROP_ = 'TOTP_SECRET';
+const TOTP_STEP_ = 30;
+const TOTP_DIGITS_ = 6;
+const BASE32_ALPHABET_ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+function base32Encode_(bytes) {
+  let bits = '', output = '';
+  for (let i = 0; i < bytes.length; i++) {
+    bits += ((bytes[i] < 0 ? bytes[i] + 256 : bytes[i]) >>> 0).toString(2).padStart(8, '0');
+  }
+  for (let i = 0; i + 5 <= bits.length; i += 5) {
+    output += BASE32_ALPHABET_[parseInt(bits.substring(i, i + 5), 2)];
+  }
+  if (bits.length % 5 !== 0) {
+    const rem = bits.length % 5;
+    const last = bits.substring(bits.length - rem).padEnd(5, '0');
+    output += BASE32_ALPHABET_[parseInt(last, 2)];
+  }
+  return output;
 }
-function getDailyAccessCode_(app) {
-  const key = normalizeAppKey_(app);
-  return PropertiesService.getScriptProperties().getProperty('ACCESS_DAILY_CODE_' + key.toUpperCase()) || '';
+function base32Decode_(str) {
+  str = String(str || '').toUpperCase().replace(/=+$/, '').replace(/[^A-Z2-7]/g, '');
+  let bits = '';
+  for (let i = 0; i < str.length; i++) {
+    const val = BASE32_ALPHABET_.indexOf(str[i]);
+    if (val === -1) continue;
+    bits += val.toString(2).padStart(5, '0');
+  }
+  const bytes = [];
+  for (let i = 0; i + 8 <= bits.length; i += 8) {
+    bytes.push(parseInt(bits.substring(i, i + 8), 2));
+  }
+  return bytes;
+}
+function getOrCreateTotpSecret_() {
+  const props = PropertiesService.getScriptProperties();
+  let secret = props.getProperty(TOTP_SECRET_PROP_);
+  if (!secret) {
+    const randomBytes = [];
+    for (let i = 0; i < 20; i++) randomBytes.push(Math.floor(Math.random() * 256));
+    secret = base32Encode_(randomBytes);
+    props.setProperty(TOTP_SECRET_PROP_, secret);
+  }
+  return secret;
+}
+function totpCodeForCounter_(secretBase32, counter) {
+  const keyBytes = base32Decode_(secretBase32).map(b => (b > 127 ? b - 256 : b));
+  const counterBytes = [];
+  let c = counter;
+  for (let i = 7; i >= 0; i--) {
+    counterBytes[i] = c & 0xff;
+    c = Math.floor(c / 256);
+  }
+  const sig = Utilities.computeHmacSha1Signature(counterBytes, keyBytes).map(b => (b < 0 ? b + 256 : b));
+  const offset = sig[sig.length - 1] & 0xf;
+  const binCode = ((sig[offset] & 0x7f) << 24) | ((sig[offset + 1] & 0xff) << 16) | ((sig[offset + 2] & 0xff) << 8) | (sig[offset + 3] & 0xff);
+  return String(binCode % Math.pow(10, TOTP_DIGITS_)).padStart(TOTP_DIGITS_, '0');
+}
+function verifyTotp_(code, secretBase32) {
+  if (!code) return false;
+  const counter = Math.floor(Date.now() / 1000 / TOTP_STEP_);
+  for (let w = -1; w <= 1; w++) {
+    if (totpCodeForCounter_(secretBase32, counter + w) === String(code).trim()) return true;
+  }
+  return false;
+}
+/**
+ * À exécuter UNE FOIS depuis l'éditeur (menu de fonctions en haut > 
+ * printTotpSetupInfo_ > ▶ Exécuter), puis lire le résultat dans
+ * Affichage > Journaux (Ctrl/Cmd+Entrée). Convertissez l'URL otpauth://
+ * en QR code (n'importe quel générateur en ligne) ou saisissez le secret
+ * manuellement dans Google Authenticator, sur chacun des 3 téléphones admin.
+ */
+function printTotpSetupInfo_() {
+  const secret = getOrCreateTotpSecret_();
+  const uri = 'otpauth://totp/' + encodeURIComponent('Atelier des Artisans') +
+    '?secret=' + secret + '&issuer=' + encodeURIComponent('Atelier des Artisans') +
+    '&period=' + TOTP_STEP_ + '&digits=' + TOTP_DIGITS_;
+  Logger.log('Secret (saisie manuelle) : ' + secret);
+  Logger.log('URL à convertir en QR code : ' + uri);
 }
 
 function checkDeviceToken_(token, app) {
@@ -182,15 +264,13 @@ function checkDeviceToken_(token, app) {
   }
   return false;
 }
-function enrollDevice_(app, dailyCode, prenom, deviceLabel) {
+function enrollDevice_(app, code, prenom, deviceLabel) {
   const key = normalizeAppKey_(app);
-  const expected = getDailyAccessCode_(key);
-  if (!expected || String(dailyCode || '') !== expected) {
-    return { ok: false, error: 'Code du jour invalide ou expiré' };
+  if (!verifyTotp_(code, getOrCreateTotpSecret_())) {
+    return { ok: false, error: 'Code invalide ou expiré' };
   }
   const token = Utilities.getUuid();
   accessSheet_().appendRow([token, prenom || '', deviceLabel || '', key, new Date().toISOString()]);
-  rotateAccessCode(key); // usage unique : ce code ne resservira pas, même le même jour
   return { ok: true, deviceToken: token };
 }
 function accessRejected_() {
@@ -261,10 +341,6 @@ function doPost(e) {
   if (which === 'planning' || which === 'demandes') return doPostPlanningOrDemandes_(data, which);
   if (which === 'admin' && data.action === 'checkToken') {
     return ContentService.createTextOutput(JSON.stringify({ ok: checkAdminToken_(data.adminToken) })).setMimeType(ContentService.MimeType.JSON);
-  }
-  if (which === 'admin' && data.action === 'getDailyCode') {
-    if (!checkAdminToken_(data.adminToken)) return adminRejected_();
-    return ContentService.createTextOutput(JSON.stringify({ ok: true, dailyCode: getDailyAccessCode_(data.app) })).setMimeType(ContentService.MimeType.JSON);
   }
 
   if (which === 'frequentation' && data.action === 'set') {

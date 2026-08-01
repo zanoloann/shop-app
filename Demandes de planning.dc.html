@@ -38,7 +38,7 @@
     <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:16px;padding:32px 30px;width:320px;box-shadow:0 20px 50px rgba(0,0,0,.15);text-align:center;">
       <div style="width:44px;height:44px;border-radius:50%;background:#B5502E;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:22px;color:#F6EFE4;margin:0 auto 14px;">D</div>
       <div style="font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:6px;">Demandes de planning</div>
-      <div style="font-size:13px;color:#8C7C63;margin-bottom:18px;">Réservé aux artisans de l'atelier — entrez le code unique communiqué par l'association (première connexion ou réinitialisation).</div>
+      <div style="font-size:13px;color:#8C7C63;margin-bottom:18px;">Réservé aux artisans de l'atelier — demandez à un administrateur le code à 6 chiffres affiché dans son appli d'authentification (première connexion ou réinitialisation).</div>
       <input type="text" value="{{ accessCodeInput }}" onChange="{{ onAccessCodeChange }}" placeholder="Code unique" style="{{ accessCodeInputStyle }}">
       <input type="text" value="{{ accessPrenomInput }}" onChange="{{ onAccessPrenomChange }}" placeholder="Prénom" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:8px;"/>
       <input type="text" value="{{ accessDeviceInput }}" onChange="{{ onAccessDeviceChange }}" placeholder="Appareil (iPhone, Samsung, PC…)" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:8px;"/>
@@ -252,12 +252,8 @@
         </div>
 
         <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:18px 20px;margin-top:16px;">
-          <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Code unique</div>
-          <div style="font-size:12px;color:#9C8F79;margin-bottom:10px;">À communiquer à un artisan pour la première connexion sur un nouvel appareil. Pour révoquer un appareil : supprimez sa ligne dans l'onglet "Accès" du Google Sheet.</div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div onClick="{{ viewDailyCode }}" style="padding:9px 16px;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:12px;cursor:pointer;"><sc-if value="{{ viewingDailyCode }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:12px;height:12px;border:2px solid #6B5E48;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>Afficher le code unique</div>
-            <div style="font-size:16px;font-weight:700;letter-spacing:.1em;color:#2B241C;">{{ adminDailyCode }}</div>
-          </div>
+          <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Code d'accès (double authentification)</div>
+          <div style="font-size:12px;color:#9C8F79;margin-bottom:10px;">Le code à 6 chiffres pour enrôler un nouvel appareil se lit directement dans l'appli Google Authenticator (ou équivalent) sur le téléphone de n'importe lequel des 3 admins — il change toutes les 30 secondes, aucun affichage ici. Pour révoquer un appareil : supprimez sa ligne dans l'onglet "Accès" du Google Sheet.</div>
         </div>
 
         <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:18px 20px;margin-top:16px;">
@@ -408,7 +404,6 @@ class Component extends DCLogic {
     accessCodeInput: '',
     accessPrenomInput: '',
     accessDeviceInput: '',
-    adminDailyCode: '',
     accessChecking: false,
     accessError: false,
     emailSyncStatus: '',
@@ -438,7 +433,6 @@ class Component extends DCLogic {
     pendingRowId: null,
     pendingRowKind: '',
     testConnecting: false,
-    viewingDailyCode: false,
     clearingAll: false,
     toast: null
   };
@@ -587,18 +581,6 @@ class Component extends DCLogic {
         this.setState({ adminError: true });
       }
     }).catch(() => this.showToast('Échec de la vérification'));
-  }
-  viewDailyCode() {
-    if (this.state.viewingDailyCode) return;
-    this.setState({ viewingDailyCode: true });
-    fetch(this.state.scriptUrl, {
-      method: 'POST', headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ sheet: 'admin', action: 'getDailyCode', app: 'planning', adminToken: this.state.adminToken, deviceToken: this.state.deviceToken })
-    }).then(r => r.json()).then(res => {
-      this.setState({ viewingDailyCode: false });
-      if (res && res.ok) this.setState({ adminDailyCode: res.dailyCode });
-      else this.showToast('Échec de récupération du code');
-    }).catch(() => { this.setState({ viewingDailyCode: false }); this.showToast('Échec de récupération du code'); });
   }
   toggleAdmin() {
     if (this.state.isAdminMode) this.setState(s => ({ isAdminMode: false, activeTab: s.activeTab === 'reglages' ? 'demandes' : s.activeTab }));
@@ -914,7 +896,6 @@ class Component extends DCLogic {
       onScriptUrlChange: (e) => this.setScriptUrl(e.target.value),
       testConnection: () => this.testConnection(),
       testConnecting: s.testConnecting,
-      viewingDailyCode: s.viewingDailyCode,
       clearingAll: s.clearingAll,
       connectionSyncLabel: (s.artisansSyncStatus === 'ok' && s.planningSyncStatus === 'ok') ? 'Connecté · ' + s.artisans.length + ' artisan(s), ' + s.planning.length + ' jour(s), ' + s.demandes.length + ' demande(s)' : (s.artisansSyncStatus === 'erreur' || s.planningSyncStatus === 'erreur') ? 'Échec de connexion' : (s.artisansSyncStatus === 'chargement' || s.planningSyncStatus === 'chargement') ? 'Connexion…' : 'Non testé',
       testEmailConnection: () => this.testEmailConnection(),
@@ -973,8 +954,6 @@ class Component extends DCLogic {
       accessChecking: s.accessChecking,
       verifyAccessCode: () => this.verifyAccessCode(),
       verifyAccessCodeStyle: `padding:11px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;` + (s.accessChecking ? `opacity:.55;cursor:default;` : `cursor:pointer;`),
-      adminDailyCode: s.adminDailyCode,
-      viewDailyCode: () => this.viewDailyCode(),
 
       hasToast: !!s.toast,
       toastMsg: s.toast || ''
