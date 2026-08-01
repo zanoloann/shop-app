@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<template id="__bundler_thumbnail">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#F6EFE4"></rect>
+  <circle cx="50" cy="42" r="18" fill="none" stroke="#B5502E" stroke-width="4"></circle>
+  <text x="50" y="49" font-family="Georgia,serif" font-size="20" fill="#B5502E" text-anchor="middle">D</text>
+</svg>
+</template>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#F6EFE4;font-family:'Manrope',sans-serif;}
+  * { box-sizing:border-box; }
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:#D8C7A6;border-radius:4px;}
+  a{color:#B5502E;} a:hover{color:#8C3D22;}
+  @keyframes dp-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  input:focus, select:focus, textarea:focus{outline:2px solid #B5502E;outline-offset:1px;}
+</style>
+</helmet>
+
+<sc-if value="{{ needsAccessCode }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F6EFE4;">
+    <sc-if value="{{ scriptUrlLoading }}" hint-placeholder-val="{{ false }}">
+      <span style="display:inline-block;width:26px;height:26px;border:3px solid #E7DAC4;border-top-color:#B5502E;border-radius:50%;animation:dp-spin 0.7s linear infinite;"></span>
+    </sc-if>
+    <sc-if value="{{ !scriptUrlLoading }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:16px;padding:32px 30px;width:320px;box-shadow:0 20px 50px rgba(0,0,0,.15);text-align:center;">
+      <div style="width:44px;height:44px;border-radius:50%;background:#B5502E;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:22px;color:#F6EFE4;margin:0 auto 14px;">D</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:6px;">Demandes de planning</div>
+      <div style="font-size:13px;color:#8C7C63;margin-bottom:18px;">Réservé aux artisans de l'atelier — entrez le code unique communiqué par l'association (première connexion ou réinitialisation).</div>
+      <input type="text" value="{{ accessCodeInput }}" onChange="{{ onAccessCodeChange }}" placeholder="Code unique" style="{{ accessCodeInputStyle }}">
+      <input type="text" value="{{ accessPrenomInput }}" onChange="{{ onAccessPrenomChange }}" placeholder="Prénom" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:8px;"/>
+      <input type="text" value="{{ accessDeviceInput }}" onChange="{{ onAccessDeviceChange }}" placeholder="Appareil (iPhone, Samsung, PC…)" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:8px;"/>
+      <div style="height:14px;font-size:12px;font-weight:700;color:#B5502E;margin-bottom:10px;">{{ accessErrorMsg }}</div>
+      <div onClick="{{ verifyAccessCode }}" style="{{ verifyAccessCodeStyle }}"><sc-if value="{{ accessChecking }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:14px;height:14px;border:2px solid #F6EFE4;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:8px;vertical-align:-2px;"></span></sc-if>Entrer</div>
+    </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ !needsAccessCode }}" hint-placeholder-val="{{ true }}">
+
+<sc-if value="{{ isLoadingData }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F6EFE4;">
+    <div style="text-align:center;">
+      <div style="font-family:'Instrument Serif',serif;font-size:26px;color:#2B241C;margin-bottom:14px;">Bienvenue</div>
+      <span style="display:inline-block;width:26px;height:26px;border:3px solid #E7DAC4;border-top-color:#B5502E;border-radius:50%;animation:dp-spin 0.7s linear infinite;"></span>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ !isLoadingData }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#F6EFE4;color:#2B241C;">
+
+
+  <div style="background:#2B241C;padding:20px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div style="width:38px;height:38px;flex:none;border-radius:50%;background:#B5502E;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:20px;color:#F6EFE4;">D</div>
+    <div style="flex:none;">
+      <div style="font-family:'Instrument Serif',serif;font-size:22px;color:#F6EFE4;line-height:1.1;">Demandes de planning</div>
+      <div style="font-size:12px;color:#B8A98A;">Atelier des Artisans</div>
+    </div>
+    <div style="flex:1;"></div>
+    <select value="{{ identityValue }}" onChange="{{ onIdentityChange }}" style="border:1px solid #4A4033;background:#3A322A;color:#F6EFE4;border-radius:20px;padding:9px 16px;font-size:13px;font-family:'Manrope',sans-serif;cursor:pointer;">
+      <sc-for list="{{ identityOptions }}" as="io" hint-placeholder-count="3">
+        <option value="{{ io.value }}">{{ io.label }}</option>
+      </sc-for>
+    </select>
+    <div onClick="{{ refreshAll }}" style="{{ refreshBtnStyle }}">
+      <span style="{{ refreshIconStyle }}">↻</span> Actualiser
+    </div>
+    <div onClick="{{ toggleAdminClick }}" style="{{ adminBtnStyle }}">{{ adminBtnLabel }}</div>
+  </div>
+
+  <div style="display:flex;gap:8px;padding:16px 24px 0;flex-wrap:wrap;">
+    <sc-for list="{{ navTabs }}" as="t" hint-placeholder-count="4">
+      <div onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</div>
+    </sc-for>
+  </div>
+
+  <div style="flex:1;display:flex;justify-content:center;padding:20px 24px 60px;">
+    <div style="width:100%;max-width:1180px;">
+
+      <sc-if value="{{ isDemandes }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="flex:1 1 200px;min-width:200px;max-width:300px;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+              <h1 style="font-family:'Instrument Serif',serif;font-size:28px;margin:0 0 4px;font-weight:400;">Demandes</h1>
+              <sc-if value="{{ isAdminMode }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ openClearAllConfirm }}" style="font-size:11px;font-weight:700;color:#B5502E;cursor:pointer;">Tout supprimer</div>
+              </sc-if>
+            </div>
+            <div style="font-size:13px;color:#8C7C63;margin-bottom:10px;">{{ demandesCountLabel }} · visibles par toute l'équipe</div>
+            <select value="{{ demandesSortBy }}" onChange="{{ onDemandesSortByChange }}" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:8px 12px;font-size:12px;color:#6B5E48;font-family:'Manrope',sans-serif;margin-bottom:16px;background:#FFFCF6;">
+              <option value="creation">Trier : date de la demande (croissant)</option>
+              <option value="concernee">Trier : date d'astreinte/renfort (croissant — plus urgent d'abord)</option>
+            </select>
+
+            <sc-if value="{{ hasNoDemandes }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:40px 0;color:#9C8F79;font-size:13px;">Aucune demande pour le moment.</div>
+            </sc-if>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <sc-for list="{{ demandesList }}" as="d" hint-placeholder-count="4">
+                <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:16px 18px;">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+                    <div style="{{ d.typeBadgeStyle }}">{{ d.typeLabel }}</div>
+                    <div style="{{ d.statutBadgeStyle }}">{{ d.statut }}</div>
+                    <div style="flex:1;"></div>
+                    <div style="font-size:12px;color:#9C8F79;">{{ d.metaLabel }}</div>
+                  </div>
+                  <div style="font-size:14px;font-weight:700;margin-bottom:4px;">{{ d.demandeur }}</div>
+                  <div style="font-size:13px;color:#6B5E48;">Souhaite {{ d.roleLabel }} le <b>{{ d.dateLabel }}</b></div>
+                  <sc-if value="{{ d.hasComment }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:12px;color:#8C7C63;font-style:italic;margin-top:6px;">« {{ d.commentaire }} »</div>
+                  </sc-if>
+                  <sc-if value="{{ d.hasTreated }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:11px;color:#9C8F79;margin-top:8px;">{{ d.treatedLabel }}</div>
+                  </sc-if>
+                  <sc-if value="{{ d.canModerate }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:8px;margin-top:12px;">
+                      <div onClick="{{ d.validate }}" style="flex:1;text-align:center;padding:8px 0;border-radius:9px;background:#3F6B45;color:#F6EFE4;font-weight:700;font-size:12px;cursor:pointer;"><sc-if value="{{ d.isValidating }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:12px;height:12px;border:2px solid #F6EFE4;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>Valider</div>
+                      <div onClick="{{ d.refuse }}" style="flex:1;text-align:center;padding:8px 0;border-radius:9px;background:#F0E6D3;color:#B5502E;font-weight:700;font-size:12px;cursor:pointer;"><sc-if value="{{ d.isRefusing }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:12px;height:12px;border:2px solid #B5502E;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>Refuser</div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ d.canCancel }}" hint-placeholder-val="{{ false }}">
+                    <div onClick="{{ d.cancel }}" style="margin-top:12px;text-align:center;padding:8px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:12px;cursor:pointer;"><sc-if value="{{ d.isCancelling }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:12px;height:12px;border:2px solid #6B5E48;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>Annuler ma demande</div>
+                  </sc-if>
+                  <sc-if value="{{ d.canDelete }}" hint-placeholder-val="{{ false }}">
+                    <div onClick="{{ d.deleteIt }}" style="margin-top:8px;text-align:center;padding:6px 0;font-weight:600;font-size:11px;color:#B5502E;cursor:pointer;"><sc-if value="{{ d.isCancelling }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:10px;height:10px;border:2px solid #B5502E;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>Supprimer cette demande</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="flex:3 1 500px;min-width:300px;">
+            <h1 style="font-family:'Instrument Serif',serif;font-size:28px;margin:0 0 4px;font-weight:400;">Planning</h1>
+            <div style="font-size:13px;color:#8C7C63;margin-bottom:16px;">Lecture seule — pour vous aider à choisir vos dates</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;">
+              <div onClick="{{ planningPrev }}" style="width:32px;height:32px;border-radius:8px;background:#FFFCF6;border:1px solid #E7DAC4;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6B5E48;font-weight:700;">‹</div>
+              <div style="font-size:14px;font-weight:700;text-align:center;text-transform:capitalize;">{{ planningPeriodLabel }}</div>
+              <div onClick="{{ planningNext }}" style="width:32px;height:32px;border-radius:8px;background:#FFFCF6;border:1px solid #E7DAC4;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6B5E48;font-weight:700;">›</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;">
+              <sc-for list="{{ planningDayLabels }}" as="dl" hint-placeholder-count="7">
+                <div style="font-size:10px;font-weight:700;color:#6B5E48;text-align:center;text-transform:uppercase;letter-spacing:.03em;">{{ dl }}</div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <sc-for list="{{ planningMonthWeeks }}" as="w" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">
+                  <sc-for list="{{ w.days }}" as="d" hint-placeholder-count="7">
+                    <div style="{{ d.cellStyle }}">
+                      <div style="font-size:10px;color:#9C8F79;">{{ d.dateNum }}</div>
+                      <sc-if value="{{ d.isClosed }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:10px;font-weight:700;color:#B0A184;">Fermé</div>
+                      </sc-if>
+                      <sc-if value="{{ d.astreinte }}" hint-placeholder-val="{{ false }}">
+                        <span style="{{ d.astreinteTagStyle }}">{{ d.astreinte }}</span>
+                      </sc-if>
+                      <sc-if value="{{ d.renfort1 }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:8px;color:#8C7C63;line-height:1.3;">R1 · {{ d.renfort1 }}</div>
+                      </sc-if>
+                      <sc-if value="{{ d.renfort2 }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:8px;color:#8C7C63;line-height:1.3;">R2 · {{ d.renfort2 }}</div>
+                      </sc-if>
+                      <sc-if value="{{ d.canAdd }}" hint-placeholder-val="{{ false }}">
+                        <div onClick="{{ d.openAdd }}" title="Faire une demande pour ce jour" style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#B5502E;color:#F6EFE4;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;line-height:1;cursor:pointer;">+</div>
+                      </sc-if>
+                      <sc-if value="{{ d.canLiberate }}" hint-placeholder-val="{{ false }}">
+                        <div onClick="{{ d.openLiberate }}" title="Libérer ma journée" style="position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#3F6B45;color:#F6EFE4;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;line-height:1;cursor:pointer;">−</div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isNouvelle }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:640px;">
+        <h1 style="font-family:'Instrument Serif',serif;font-size:28px;margin:0 0 4px;font-weight:400;">Mes demandes et mes astreintes</h1>
+        <div style="font-size:13px;color:#8C7C63;margin-bottom:18px;">Toute demande doit être validée par l'administrateur avant de s'appliquer au planning</div>
+
+        <sc-if value="{{ identityMissing }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:12px;padding:16px 18px;font-size:13px;color:#8C7C63;">Sélectionnez d'abord votre profil en haut de page.</div>
+        </sc-if>
+
+        <sc-if value="{{ identityPresent }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Mes astreintes à venir</div>
+          <sc-if value="{{ hasNoMesAstreintes }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:13px;color:#9C8F79;margin-bottom:20px;">Aucune astreinte ou renfort à venir à votre nom.</div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
+            <sc-for list="{{ mesAstreintesList }}" as="ma" hint-placeholder-count="2">
+              <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div style="font-size:13px;text-transform:capitalize;">{{ ma.dateLabel }}</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:#F0E6D3;color:#6B5E48;">{{ ma.roleLabel }}</div>
+                  <div onClick="{{ ma.openLiberate }}" title="Demander la suppression" style="width:20px;height:20px;border-radius:50%;background:#F5DED6;color:#B5502E;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;">×</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Mes demandes</div>
+          <sc-if value="{{ hasNoMesDemandes }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:13px;color:#9C8F79;margin-bottom:20px;">Vous n'avez pas encore fait de demande.</div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+            <sc-for list="{{ mesDemandesList }}" as="d" hint-placeholder-count="2">
+              <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:12px;padding:12px 16px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+                  <div style="{{ d.typeBadgeStyle }}">{{ d.typeLabel }}</div>
+                  <div style="{{ d.statutBadgeStyle }}">{{ d.statut }}</div>
+                </div>
+                <div style="font-size:13px;color:#6B5E48;">{{ d.roleLabel }} le <b>{{ d.dateLabel }}</b></div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="border-top:1px solid #E7DAC4;padding-top:20px;font-size:13px;color:#8C7C63;">Pour faire une nouvelle demande, utilisez le calendrier dans l'onglet « Demandes &amp; Planning » : le bouton <b>+</b> sur un jour vide pour prendre un poste, ou cliquez sur votre propre jour d'astreinte/renfort pour le libérer.</div>
+        </sc-if></div>
+      </sc-if>
+
+      <sc-if value="{{ isReglages }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:640px;">
+        <h1 style="font-family:'Instrument Serif',serif;font-size:28px;margin:0 0 4px;font-weight:400;">Réglages</h1>
+        <div style="font-size:13px;color:#8C7C63;margin-bottom:20px;">Ces adresses sont partagées avec l'appli Caisse sur cet appareil</div>
+
+        <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:18px 20px;margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Google Sheet</div>
+          <div style="font-size:12px;color:#9C8F79;margin-bottom:10px;">URL du script Apps Script (un seul classeur, un seul script pour Ventes, Artisans, Planning et Demandes)</div>
+          <input type="text" placeholder="https://script.google.com/macros/s/…/exec" value="{{ scriptUrl }}" onChange="{{ onScriptUrlChange }}" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:13px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div onClick="{{ testConnection }}" style="padding:9px 16px;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:12px;cursor:pointer;"><sc-if value="{{ testConnecting }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:12px;height:12px;border:2px solid #6B5E48;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>Tester la connexion</div>
+            <div style="font-size:12px;font-weight:600;color:#9C8F79;">{{ connectionSyncLabel }}</div>
+          </div>
+        </div>
+
+        <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:18px 20px;margin-top:16px;">
+          <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Code unique</div>
+          <div style="font-size:12px;color:#9C8F79;margin-bottom:10px;">À communiquer à un artisan pour la première connexion sur un nouvel appareil. Pour révoquer un appareil : supprimez sa ligne dans l'onglet "Accès" du Google Sheet.</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div onClick="{{ viewDailyCode }}" style="padding:9px 16px;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:12px;cursor:pointer;"><sc-if value="{{ viewingDailyCode }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:12px;height:12px;border:2px solid #6B5E48;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>Afficher le code unique</div>
+            <div style="font-size:16px;font-weight:700;letter-spacing:.1em;color:#2B241C;">{{ adminDailyCode }}</div>
+          </div>
+        </div>
+
+        <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:18px 20px;margin-top:16px;">
+          <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">E-mail de notification</div>
+          <div style="font-size:12px;color:#9C8F79;margin-bottom:10px;">Envoyé via le même script que le Planning (aucune URL supplémentaire à renseigner).</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div onClick="{{ testEmailConnection }}" style="padding:9px 16px;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:12px;cursor:pointer;">Envoyer un mail de test</div>
+            <div style="font-size:12px;font-weight:600;color:#9C8F79;">{{ emailSyncLabel }}</div>
+          </div>
+        </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <sc-if value="{{ showClearAllConfirm }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:20;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:26px 28px;width:320px;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="font-family:'Instrument Serif',serif;font-size:20px;margin-bottom:10px;">Tout supprimer ?</div>
+        <div style="font-size:13px;color:#6B5E48;margin-bottom:20px;">Toutes les demandes seront définitivement supprimées du Sheet, quel que soit leur statut.</div>
+        <div style="display:flex;gap:8px;">
+          <div onClick="{{ closeClearAllConfirm }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">Annuler</div>
+          <div onClick="{{ clearAllDemandes }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#B5502E;color:#F6EFE4;font-weight:700;font-size:13px;cursor:pointer;"><sc-if value="{{ clearingAll }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:14px;height:14px;border:2px solid #F6EFE4;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:8px;vertical-align:-2px;"></span></sc-if>Supprimer tout</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showQuickRequest }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:20;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:26px 28px;width:340px;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="font-family:'Instrument Serif',serif;font-size:20px;margin-bottom:4px;">Demande pour ce jour</div>
+        <div style="font-size:13px;color:#8C7C63;text-transform:capitalize;margin-bottom:16px;">{{ quickRequestDateLabel }}</div>
+
+        <div style="font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Artisan</div>
+        <select value="{{ quickRequestArtisan }}" onChange="{{ onQuickRequestArtisanChange }}" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:14px;">
+          <sc-for list="{{ identityOptions }}" as="qo" hint-placeholder-count="3">
+            <option value="{{ qo.value }}">{{ qo.label }}</option>
+          </sc-for>
+        </select>
+
+        <div style="font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Type</div>
+        <select value="{{ quickRequestType }}" onChange="{{ onQuickRequestTypeChange }}" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:14px;">
+          <sc-for list="{{ quickRequestTypeOptions }}" as="qt" hint-placeholder-count="2">
+            <option value="{{ qt.value }}">{{ qt.label }}</option>
+          </sc-for>
+        </select>
+
+        <div style="font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Commentaire (optionnel)</div>
+        <textarea value="{{ quickRequestComment }}" onChange="{{ onQuickRequestCommentChange }}" rows="2" placeholder="Précisez si besoin…" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;resize:vertical;margin-bottom:16px;"></textarea>
+
+        <div style="display:flex;gap:8px;">
+          <div onClick="{{ closeQuickRequest }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">Annuler</div>
+          <div onClick="{{ submitQuickRequest }}" style="{{ submitQuickRequestStyle }}"><sc-if value="{{ isSubmittingRequest }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:14px;height:14px;border:2px solid #F6EFE4;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:8px;vertical-align:-2px;"></span></sc-if>{{ submitQuickRequestLabel }}</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showLiberateRequest }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:20;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:26px 28px;width:340px;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="font-family:'Instrument Serif',serif;font-size:20px;margin-bottom:4px;">Libérer cette journée</div>
+        <div style="font-size:13px;color:#8C7C63;text-transform:capitalize;margin-bottom:14px;">{{ liberateDateLabel }} — {{ liberateRoleLabel }}</div>
+        <div style="font-size:12px;color:#8C6D1F;background:#F3E7C9;border-radius:10px;padding:10px 12px;margin-bottom:14px;">Une demande de suppression proche de la date peut être problématique pour la boutique et l'organisation générale. N'hésitez pas à contacter les responsables si nécessaire.</div>
+        <div style="font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Commentaire (optionnel)</div>
+        <textarea value="{{ liberateComment }}" onChange="{{ onLiberateCommentChange }}" rows="3" placeholder="Précisez si besoin…" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;resize:vertical;margin-bottom:16px;"></textarea>
+        <div style="display:flex;gap:8px;">
+          <div onClick="{{ closeLiberateRequest }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">Annuler</div>
+          <div onClick="{{ submitLiberateRequest }}" style="{{ submitLiberateRequestStyle }}"><sc-if value="{{ isSubmittingRequest }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:14px;height:14px;border:2px solid #F6EFE4;border-top-color:transparent;border-radius:50%;animation:dp-spin 0.7s linear infinite;margin-right:8px;vertical-align:-2px;"></span></sc-if>{{ submitLiberateRequestLabel }}</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showAdminPrompt }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:20;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:26px 28px;width:300px;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="font-family:'Instrument Serif',serif;font-size:20px;margin-bottom:14px;">Mode administrateur</div>
+        <input type="password" value="{{ adminPasswordInput }}" onChange="{{ onAdminPasswordChange }}" placeholder="Code administrateur" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:6px;">
+        <div style="height:14px;font-size:12px;font-weight:700;color:#B5502E;margin-bottom:8px;">{{ adminErrorMsg }}</div>
+        <div style="display:flex;gap:8px;">
+          <div onClick="{{ cancelAdminPrompt }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">Annuler</div>
+          <div onClick="{{ confirmAdminToken }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;cursor:pointer;">Valider</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2B241C;color:#F6EFE4;padding:12px 22px;border-radius:24px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:30;">{{ toastMsg }}</div>
+  </sc-if>
+
+</div>
+</sc-if>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function parseFrDate(str) {
+  if (!str) return null;
+  const parts = String(str).split('/');
+  if (parts.length === 3 && parts[0].length <= 2) {
+    return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+  }
+  const native = new Date(str);
+  return isNaN(native) ? null : native;
+}
+function rowToPlanning(row) {
+  return {
+    dateStr: row.date,
+    ts: parseFrDate(row.date),
+    fermeture: !!row.fermeture,
+    astreinte: row.astreinte,
+    renfort1: row.renfort1,
+    renfort2: row.renfort2
+  };
+}
+function normName(v) { return (v || '').toString().trim().toLowerCase(); }
+function isMeName(name, own) {
+  const a = normName(name), b = normName(own);
+  if (!a || !b) return false;
+  return a === b || a.includes(b) || b.includes(a);
+}
+function isoToFr(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return d + '/' + m + '/' + y;
+}
+function frToIso(fr) {
+  if (!fr) return '';
+  const [d, m, y] = fr.split('/');
+  return y + '-' + m + '-' + d;
+}
+function frToDisplay(fr) {
+  const dt = parseFrDate(fr);
+  if (!dt) return fr || '';
+  return dt.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+class Component extends DCLogic {
+  state = {
+    scriptUrl: localStorage.getItem('suivi-ventes-script-url') || localStorage.getItem('suivi-ventes-planning-script-url') || '',
+    scriptUrlLoading: false,
+    adminToken: localStorage.getItem('app-admin-token') || '',
+    deviceToken: localStorage.getItem('app-device-token-planning') || '',
+    accessCodeInput: '',
+    accessPrenomInput: '',
+    accessDeviceInput: '',
+    adminDailyCode: '',
+    accessChecking: false,
+    accessError: false,
+    emailSyncStatus: '',
+    identity: localStorage.getItem('demandes-planning-identity') || '',
+    isLoadingData: false,
+    artisans: [],
+    planning: [],
+    demandes: [],
+    artisansSyncStatus: '',
+    planningSyncStatus: '',
+    activeTab: 'demandes',
+    isAdminMode: false,
+    showAdminPrompt: false,
+    adminPasswordInput: '',
+    adminError: false,
+    isRefreshing: false,
+    isSubmittingRequest: false,
+    planningOffset: 0,
+    quickRequestDay: null,
+    quickRequestArtisan: '',
+    quickRequestType: '',
+    quickRequestComment: '',
+    liberateDay: null,
+    liberateComment: '',
+    demandesSortBy: 'creation',
+    showClearAllConfirm: false,
+    pendingRowId: null,
+    pendingRowKind: '',
+    testConnecting: false,
+    viewingDailyCode: false,
+    clearingAll: false,
+    toast: null
+  };
+
+  componentDidMount() {
+    const proceed = () => {
+      if (this.state.scriptUrl && this.state.deviceToken) {
+        this.setState({ isLoadingData: true });
+        Promise.all([this.fetchArtisans(), this.fetchPlanning(), this.fetchDemandes()]).then(() => this.setState({ isLoadingData: false }));
+      }
+    };
+    if (this.state.scriptUrl) { proceed(); return; }
+    this.setState({ scriptUrlLoading: true });
+    fetch('./script-url.txt').then(r => r.text()).then(t => {
+      const url = (t || '').trim();
+      if (url) localStorage.setItem('suivi-ventes-script-url', url);
+      this.setState({ scriptUrl: url, scriptUrlLoading: false });
+      proceed();
+    }).catch(() => this.setState({ scriptUrlLoading: false }));
+  }
+  verifyAccessCode() {
+    if (!this.state.scriptUrl) { this.setState({ accessError: true }); return; }
+    if (!this.state.accessPrenomInput.trim() || !this.state.accessDeviceInput.trim()) { this.setState({ accessError: true, accessCodeInvalid: false }); return; }
+    this.setState({ accessChecking: true, accessError: false, accessCodeInvalid: false });
+    fetch(this.state.scriptUrl, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'access', action: 'enroll', app: 'planning', dailyCode: this.state.accessCodeInput, prenom: this.state.accessPrenomInput.trim(), deviceLabel: this.state.accessDeviceInput.trim() })
+    }).then(r => r.json()).then(res => {
+      if (res && res.ok) {
+        localStorage.setItem('app-device-token-planning', res.deviceToken);
+        this.setState({ deviceToken: res.deviceToken, accessChecking: false, accessCodeInput: '', isLoadingData: true });
+        Promise.all([this.fetchArtisans(), this.fetchPlanning(), this.fetchDemandes()]).then(() => this.setState({ isLoadingData: false }));
+      } else {
+        this.setState({ accessChecking: false, accessError: true, accessCodeInvalid: true });
+      }
+    }).catch(() => { this.setState({ accessChecking: false, accessError: true }); });
+  }
+
+  showToast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  urlWithSheet_(url, which) {
+    return url + (url.includes('?') ? '&' : '?') + 'sheet=' + which + '&app=planning&deviceToken=' + encodeURIComponent(this.state.deviceToken);
+  }
+
+  fetchArtisans() {
+    if (!this.state.scriptUrl) return Promise.resolve();
+    this.setState({ artisansSyncStatus: 'chargement' });
+    return fetch(this.urlWithSheet_(this.state.scriptUrl, 'artisans'))
+      .then(r => r.json())
+      .then(list => {
+        if (!Array.isArray(list)) { this.handleAccessRejected_(); return; }
+        this.setState({ artisans: list, artisansSyncStatus: 'ok' });
+      })
+      .catch(() => this.setState({ artisansSyncStatus: 'erreur' }));
+  }
+  handleAccessRejected_() {
+    localStorage.removeItem('app-device-token-planning');
+    this.setState({ deviceToken: '', artisans: [], planning: [], demandes: [], artisansSyncStatus: 'erreur', planningSyncStatus: 'erreur' });
+    this.showToast('Accès révoqué — ressaisissez le code unique');
+  }
+  fetchPlanning() {
+    if (!this.state.scriptUrl) return Promise.resolve();
+    this.setState({ planningSyncStatus: 'chargement' });
+    return fetch(this.urlWithSheet_(this.state.scriptUrl, 'planning'))
+      .then(r => r.json())
+      .then(list => this.setState({ planning: Array.isArray(list) ? list.map(rowToPlanning) : [], planningSyncStatus: Array.isArray(list) ? 'ok' : 'erreur' }))
+      .catch(() => this.setState({ planningSyncStatus: 'erreur' }));
+  }
+  fetchDemandes() {
+    if (!this.state.scriptUrl) return Promise.resolve();
+    return fetch(this.urlWithSheet_(this.state.scriptUrl, 'demandes'))
+      .then(r => r.json())
+      .then(list => this.setState({ demandes: Array.isArray(list) ? list : [] }))
+      .catch(() => {});
+  }
+  testConnection() {
+    if (!this.state.scriptUrl) { this.showToast('Renseignez une URL'); return; }
+    this.setState({ artisansSyncStatus: 'chargement', planningSyncStatus: 'chargement', testConnecting: true });
+    Promise.all([
+      fetch(this.urlWithSheet_(this.state.scriptUrl, 'artisans')).then(r => r.json()),
+      fetch(this.urlWithSheet_(this.state.scriptUrl, 'planning')).then(r => r.json()),
+      fetch(this.urlWithSheet_(this.state.scriptUrl, 'demandes')).then(r => r.json())
+    ]).then(([artisans, planning, demandes]) => {
+      if (!Array.isArray(artisans) || !Array.isArray(planning) || !Array.isArray(demandes)) {
+        this.setState({ artisansSyncStatus: 'erreur', planningSyncStatus: 'erreur', testConnecting: false });
+        this.showToast('Réponse inattendue — vérifiez que l\'URL est bien celle du script');
+        return;
+      }
+      localStorage.setItem('suivi-ventes-script-url', this.state.scriptUrl);
+      this.setState({ artisans, planning: planning.map(rowToPlanning), demandes, artisansSyncStatus: 'ok', planningSyncStatus: 'ok', testConnecting: false });
+      this.showToast('Connexion réussie — ' + artisans.length + ' artisan(s), ' + planning.length + ' jour(s), ' + demandes.length + ' demande(s)');
+    }).catch(() => { this.setState({ artisansSyncStatus: 'erreur', planningSyncStatus: 'erreur', testConnecting: false }); this.showToast('Échec de connexion'); });
+  }
+  setScriptUrl(v) { this.setState({ scriptUrl: v }); }
+  testEmailConnection() {
+    if (!this.state.scriptUrl) { this.showToast('Renseignez d\'abord l\'URL du script'); return; }
+    this.setState({ emailSyncStatus: 'chargement' });
+    fetch(this.state.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'email', test: true, deviceToken: this.state.deviceToken })
+    }).then(r => r.json()).then(res => {
+      if (res && res.ok) {
+        this.setState({ emailSyncStatus: 'ok' });
+        this.showToast('Mail de test envoyé à ' + (res.sentTo || 'l\'association'));
+      } else {
+        this.setState({ emailSyncStatus: 'erreur' });
+        this.showToast('Échec de l\'envoi : ' + (res && res.error ? res.error : 'erreur inconnue'));
+      }
+    }).catch(() => { this.setState({ emailSyncStatus: 'erreur' }); this.showToast('Échec de connexion au script'); });
+  }
+  setIdentity(v) {
+    localStorage.setItem('demandes-planning-identity', v);
+    this.setState({ identity: v });
+  }
+  setActiveTab(id) { this.setState({ activeTab: id }); }
+  setDemandesSortBy(v) { this.setState({ demandesSortBy: v }); }
+
+  openAdminPrompt() {
+    this.setState({ showAdminPrompt: true, adminPasswordInput: '', adminError: false });
+  }
+  cancelAdminPrompt() { this.setState({ showAdminPrompt: false, adminPasswordInput: '', adminError: false }); }
+  resetAppData() {
+    localStorage.removeItem('suivi-ventes-script-url');
+    localStorage.removeItem('suivi-ventes-planning-script-url');
+    localStorage.removeItem('app-admin-token');
+    localStorage.removeItem('app-device-token-planning');
+    this.setState({ scriptUrl: '', adminToken: '', deviceToken: '', isAdminMode: false, showAdminPrompt: false, activeTab: 'demandes', artisans: [], planning: [], demandes: [], artisansSyncStatus: '', planningSyncStatus: '' });
+    this.showToast('Paramètres réinitialisés');
+  }
+  confirmAdminToken() {
+    const token = this.state.adminPasswordInput;
+    fetch(this.state.scriptUrl, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'admin', action: 'checkToken', adminToken: token, deviceToken: this.state.deviceToken })
+    }).then(r => r.json()).then(res => {
+      if (res && res.ok) {
+        localStorage.setItem('app-admin-token', token);
+        this.setState({ isAdminMode: true, adminToken: token, showAdminPrompt: false, adminPasswordInput: '', adminError: false });
+        this.showToast('Mode administrateur activé');
+      } else {
+        this.setState({ adminError: true });
+      }
+    }).catch(() => this.showToast('Échec de la vérification'));
+  }
+  viewDailyCode() {
+    if (this.state.viewingDailyCode) return;
+    this.setState({ viewingDailyCode: true });
+    fetch(this.state.scriptUrl, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'admin', action: 'getDailyCode', app: 'planning', adminToken: this.state.adminToken, deviceToken: this.state.deviceToken })
+    }).then(r => r.json()).then(res => {
+      this.setState({ viewingDailyCode: false });
+      if (res && res.ok) this.setState({ adminDailyCode: res.dailyCode });
+      else this.showToast('Échec de récupération du code');
+    }).catch(() => { this.setState({ viewingDailyCode: false }); this.showToast('Échec de récupération du code'); });
+  }
+  toggleAdmin() {
+    if (this.state.isAdminMode) this.setState(s => ({ isAdminMode: false, activeTab: s.activeTab === 'reglages' ? 'demandes' : s.activeTab }));
+    else this.openAdminPrompt();
+  }
+
+  postDemande_(payload) {
+    return fetch(this.state.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'demandes', action: 'add', deviceToken: this.state.deviceToken, ...payload })
+    }).then(r => r.json());
+  }
+  openLiberateRequest(day) { this.setState({ liberateDay: day, liberateComment: '' }); }
+  closeLiberateRequest() { this.setState({ liberateDay: null }); }
+  setLiberateComment(v) { this.setState({ liberateComment: v }); }
+  submitLiberateRequest() {
+    const s = this.state;
+    if (s.isSubmittingRequest) return;
+    const day = s.liberateDay;
+    if (!day || !s.identity) return;
+    this.setState({ isSubmittingRequest: true });
+    this.postDemande_({ type: 'liberation_' + day.role, demandeur: s.identity, dateConcernee: day.dateStr, commentaire: s.liberateComment })
+      .then(list => {
+        this.setState({ demandes: list, liberateDay: null, liberateComment: '', isSubmittingRequest: false });
+        this.showToast('Demande envoyée — en attente de validation');
+      }).catch(() => { this.setState({ isSubmittingRequest: false }); this.showToast("Échec d'envoi de la demande"); });
+  }
+  setStatut(id, statut) {
+    if (this.state.pendingRowId) return;
+    this.setState({ pendingRowId: id, pendingRowKind: statut === 'Validée' ? 'validate' : 'refuse' });
+    fetch(this.state.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'demandes', action: 'status', id, statut, traitePar: this.state.isAdminMode ? 'Administrateur' : this.state.identity, adminToken: this.state.adminToken, deviceToken: this.state.deviceToken })
+    }).then(r => r.json()).then(result => {
+      this.setState({ demandes: result.list, pendingRowId: null, pendingRowKind: '' });
+      if (result.conflict) {
+        this.showToast('Conflit ⚠ — ' + result.conflict.role + ' du ' + result.conflict.dateConcernee + ' déjà occupé par ' + result.conflict.occupiedBy + ', demande laissée en attente');
+      } else {
+        this.showToast(statut === 'Validée' ? 'Demande validée' : 'Demande refusée');
+        if (statut === 'Validée') this.fetchPlanning();
+      }
+    }).catch(() => { this.setState({ pendingRowId: null, pendingRowKind: '' }); this.showToast('Échec de la mise à jour'); });
+  }
+  openClearAllConfirm() { this.setState({ showClearAllConfirm: true }); }
+  closeClearAllConfirm() { this.setState({ showClearAllConfirm: false }); }
+  clearAllDemandes() {
+    if (this.state.clearingAll) return;
+    this.setState({ clearingAll: true });
+    fetch(this.state.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'demandes', action: 'clearAll', adminToken: this.state.adminToken, deviceToken: this.state.deviceToken })
+    }).then(r => r.json()).then(list => {
+      this.setState({ demandes: list, showClearAllConfirm: false, clearingAll: false });
+      this.showToast('Toutes les demandes ont été supprimées');
+    }).catch(() => { this.setState({ showClearAllConfirm: false }); this.showToast('Échec de la suppression'); });
+  }
+  cancelDemande(id) {
+    if (this.state.pendingRowId) return;
+    this.setState({ pendingRowId: id, pendingRowKind: 'cancel' });
+    fetch(this.state.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'demandes', action: 'remove', id, deviceToken: this.state.deviceToken })
+    }).then(r => r.json()).then(list => {
+      this.setState({ demandes: list, pendingRowId: null, pendingRowKind: '' });
+      this.showToast('Demande annulée');
+    }).catch(() => { this.setState({ pendingRowId: null, pendingRowKind: '' }); this.showToast("Échec de l'annulation"); });
+  }
+
+  shiftPlanningOffset(delta) { this.setState(s => ({ planningOffset: s.planningOffset + delta })); }
+
+  refreshAll() {
+    if (this.state.isRefreshing) return;
+    this.setState({ isRefreshing: true });
+    const tasks = [];
+    if (this.state.scriptUrl) {
+      tasks.push(fetch(this.urlWithSheet_(this.state.scriptUrl, 'artisans')).then(r => r.json()).then(artisans => this.setState({ artisans })));
+      tasks.push(fetch(this.urlWithSheet_(this.state.scriptUrl, 'planning')).then(r => r.json()).then(list => this.setState({ planning: Array.isArray(list) ? list.map(rowToPlanning) : [] })));
+      tasks.push(fetch(this.urlWithSheet_(this.state.scriptUrl, 'demandes')).then(r => r.json()).then(demandes => this.setState({ demandes: Array.isArray(demandes) ? demandes : [] })));
+    }
+    Promise.all(tasks).then(() => { this.setState({ isRefreshing: false }); this.showToast('Informations à jour'); })
+      .catch(() => { this.setState({ isRefreshing: false }); this.showToast('Échec du rafraîchissement'); });
+  }
+
+  openQuickRequest(day) {
+    this.setState({
+      quickRequestDay: day,
+      quickRequestArtisan: '',
+      quickRequestType: (day.emptyTypeOptions[0] || {}).value || '',
+      quickRequestComment: ''
+    });
+  }
+  closeQuickRequest() { this.setState({ quickRequestDay: null }); }
+  setQuickRequestArtisan(v) { this.setState({ quickRequestArtisan: v }); }
+  setQuickRequestType(v) { this.setState({ quickRequestType: v }); }
+  setQuickRequestComment(v) { this.setState({ quickRequestComment: v }); }
+  submitQuickRequest() {
+    const s = this.state;
+    if (s.isSubmittingRequest) return;
+    const day = s.quickRequestDay;
+    if (!day || !s.quickRequestArtisan || !s.quickRequestType) { this.showToast('Merci de choisir un artisan et un type'); return; }
+    this.setState({ isSubmittingRequest: true });
+    this.postDemande_({ type: s.quickRequestType, demandeur: s.quickRequestArtisan, dateConcernee: day.dateStr, commentaire: s.quickRequestComment })
+      .then(list => {
+        this.setState({ demandes: list, quickRequestDay: null, isSubmittingRequest: false });
+        this.showToast('Demande envoyée — en attente de validation');
+      }).catch(() => { this.setState({ isSubmittingRequest: false }); this.showToast("Échec d'envoi de la demande"); });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const identity = s.identity;
+
+    const identityOptions = [{ value: '', label: '— Sélectionner —' }].concat(
+      s.artisans.map(a => ({ value: a.prenom + ' ' + a.nom, label: a.prenom + ' ' + a.nom }))
+    );
+
+    const navTabsDef = [
+      { id: 'demandes', label: 'Demandes & Planning' },
+      { id: 'nouvelle', label: 'Mes demandes et mes astreintes' }
+    ].concat(s.isAdminMode ? [{ id: 'reglages', label: 'Réglages' }] : []);
+    const navTabs = navTabsDef.map(t => {
+      const active = t.id === s.activeTab;
+      return {
+        ...t,
+        select: () => this.setActiveTab(t.id),
+        style: `padding:9px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;` +
+          (active ? `background:#2B241C;color:#F6EFE4;` : `background:#FFFCF6;color:#6B5E48;border:1px solid #E7DAC4;`)
+      };
+    });
+
+    const statutColors = {
+      'En attente': { bg: '#F3E7C9', fg: '#8C6D1F' },
+      'Validée': { bg: '#E1EDE2', fg: '#3F6B45' },
+      'Refusée': { bg: '#F5DED6', fg: '#B5502E' }
+    };
+    const typeLabels = {
+      astreinte: 'Astreinte précise', renfort1: 'Renfort 1', renfort2: 'Renfort 2',
+      liberation_astreinte: 'Libération — Astreinte', liberation_renfort1: 'Libération — Renfort 1', liberation_renfort2: 'Libération — Renfort 2'
+    };
+    const roleLabels = {
+      astreinte: "être d'astreinte", renfort1: 'faire Renfort 1', renfort2: 'faire Renfort 2',
+      liberation_astreinte: 'libérer son astreinte', liberation_renfort1: 'libérer son Renfort 1', liberation_renfort2: 'libérer son Renfort 2'
+    };
+    const demandesSortComparators = {
+      creation: (a, b) => new Date(a.dateCreation || 0) - new Date(b.dateCreation || 0),
+      concernee: (a, b) => (parseFrDate(a.dateConcernee) || 0) - (parseFrDate(b.dateConcernee) || 0)
+    };
+    const demandesSorted = [...(Array.isArray(s.demandes) ? s.demandes : [])].sort(demandesSortComparators[s.demandesSortBy] || demandesSortComparators.creation);
+    const demandesList = demandesSorted.map(d => {
+      const sc = statutColors[d.statut] || statutColors['En attente'];
+      const isMine = normName(d.demandeur) === normName(identity);
+      return {
+        id: d.id,
+        typeLabel: typeLabels[d.type] || 'Astreinte précise',
+        typeBadgeStyle: `font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:#F0E6D3;color:#6B5E48;display:inline-block;`,
+        demandeur: d.demandeur,
+        roleLabel: roleLabels[d.type] || "être d'astreinte",
+        dateLabel: frToDisplay(d.dateConcernee),
+        commentaire: d.commentaire,
+        hasComment: !!d.commentaire,
+        statut: d.statut,
+        statutBadgeStyle: `font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:${sc.bg};color:${sc.fg};display:inline-block;`,
+        metaLabel: 'Demandé le ' + (d.dateCreation ? new Date(d.dateCreation).toLocaleDateString('fr-FR') : ''),
+        treatedLabel: d.traitePar ? ('Traité par ' + d.traitePar + (d.dateTraitement ? ' le ' + new Date(d.dateTraitement).toLocaleDateString('fr-FR') : '')) : '',
+        hasTreated: !!d.traitePar,
+        canModerate: s.isAdminMode && d.statut === 'En attente',
+        canCancel: !s.isAdminMode && isMine && d.statut === 'En attente',
+        canDelete: s.isAdminMode,
+        validate: () => this.setStatut(d.id, 'Validée'),
+        refuse: () => this.setStatut(d.id, 'Refusée'),
+        cancel: () => this.cancelDemande(d.id),
+        deleteIt: () => this.cancelDemande(d.id),
+        isValidating: s.pendingRowId === d.id && s.pendingRowKind === 'validate',
+        isRefusing: s.pendingRowId === d.id && s.pendingRowKind === 'refuse',
+        isCancelling: s.pendingRowId === d.id && (s.pendingRowKind === 'cancel'),
+        rowBusy: s.pendingRowId === d.id
+      };
+    });
+
+    const todayForPlanning = new Date(); todayForPlanning.setHours(0, 0, 0, 0);
+    const roleLabelsShort = { astreinte: 'Astreinte', renfort1: 'Renfort 1', renfort2: 'Renfort 2' };
+    const mesAstreintesRaw = [];
+    s.planning.forEach(p => {
+      if (!p.ts || p.ts < todayForPlanning) return;
+      ['astreinte', 'renfort1', 'renfort2'].forEach(role => {
+        if (p[role] && isMeName(p[role], identity)) mesAstreintesRaw.push({ ts: p.ts, dateStr: p.dateStr, role });
+      });
+    });
+    mesAstreintesRaw.sort((a, b) => a.ts - b.ts);
+    const mesAstreintesList = mesAstreintesRaw.map((m, i) => ({
+      id: 'ma' + i,
+      dateLabel: frToDisplay(m.dateStr),
+      roleLabel: roleLabelsShort[m.role],
+      openLiberate: () => this.openLiberateRequest({ dateStr: m.dateStr, dateLabel: frToDisplay(m.dateStr), role: m.role, roleLabel: roleLabelsShort[m.role] })
+    }));
+    const mesDemandesList = demandesList.filter(d => normName(d.demandeur) === normName(identity));
+
+    const roleLabelsShort2 = { astreinte: 'Astreinte', renfort1: 'Renfort 1', renfort2: 'Renfort 2' };
+    const liberationOptions = [{ value: '', label: '— Choisir une journée —' }].concat(
+      mesAstreintesRaw.map(m => ({ value: m.dateStr + '|' + m.role, label: frToDisplay(m.dateStr) + ' — ' + roleLabelsShort2[m.role] }))
+    );
+
+    const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    const dayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    const findPlanningEntry = (d) => s.planning.find(p => p.ts && p.ts.toDateString() === d.toDateString());
+    const liberatedSet = new Set();
+    s.demandes.forEach(dm => {
+      if (dm.statut === 'Validée' && String(dm.type || '').startsWith('liberation_')) {
+        liberatedSet.add(dm.dateConcernee + '|' + dm.type.replace('liberation_', ''));
+      }
+    });
+    const monthDate = new Date(todayForPlanning.getFullYear(), todayForPlanning.getMonth() + s.planningOffset, 1);
+    const firstIdx = (monthDate.getDay() + 6) % 7;
+    const gridStart = new Date(monthDate); gridStart.setDate(1 - firstIdx);
+    const weeks = [];
+    for (let w = 0; w < 6; w++) {
+      const days = [];
+      for (let d0 = 0; d0 < 7; d0++) {
+        const d = new Date(gridStart); d.setDate(gridStart.getDate() + w * 7 + d0);
+        const entry = findPlanningEntry(d);
+        const inMonth = d.getMonth() === monthDate.getMonth();
+        const isToday = d.toDateString() === todayForPlanning.toDateString();
+        const isClosed = !!(entry && entry.fermeture);
+        const astreinte = entry ? entry.astreinte || '' : '';
+        const renfort1 = entry ? entry.renfort1 || '' : '';
+        const renfort2 = entry ? entry.renfort2 || '' : '';
+        const astreinteIsMe = !!astreinte && isMeName(astreinte, identity);
+        const typeDefs = [
+          { id: 'astreinte', label: 'Astreinte', value: astreinte },
+          { id: 'renfort1', label: 'Renfort 1', value: renfort1 },
+          { id: 'renfort2', label: 'Renfort 2', value: renfort2 }
+        ];
+        const emptyTypes = entry && !isClosed ? typeDefs.filter(t => !t.value) : [];
+        const canAdd = emptyTypes.length > 0;
+        const myRoleThisDay = !isClosed && identity ? typeDefs.find(t => t.value && isMeName(t.value, identity)) : null;
+        const canLiberate = !!myRoleThisDay;
+        const isEmptyDay = !!entry && !isClosed && typeDefs.every(t => !t.value);
+        const isLiberatedEmpty = isEmptyDay && entry && typeDefs.some(t => liberatedSet.has(entry.dateStr + '|' + t.id));
+        const isPresentMe = !!identity && !!entry && typeDefs.some(t => t.value && isMeName(t.value, identity));
+        let bg, borderColor = '#E7DAC4', borderWidth = '1px';
+        if (isClosed) { bg = '#E9E4D8'; }
+        else if (isPresentMe) { bg = '#E7F1E8'; borderColor = '#3F6B45'; borderWidth = '2px'; }
+        else if (isLiberatedEmpty) { bg = '#F7DCD3'; borderColor = '#B5502E'; borderWidth = '2px'; }
+        else if (isEmptyDay) { bg = '#FCEAD2'; borderColor = '#C98A3D'; borderWidth = '2px'; }
+        else if (inMonth) { bg = '#FFFCF6'; }
+        else { bg = '#F6EFE4'; }
+        let opacity = '1';
+        if (isClosed) opacity = '.6'; else if (!inMonth) opacity = '.5';
+        days.push({
+          dateNum: d.getDate(),
+          isClosed,
+          astreinte,
+          renfort1,
+          renfort2,
+          canAdd,
+          openAdd: () => this.openQuickRequest({
+            dateStr: entry ? entry.dateStr : '',
+            dateLabel: frToDisplay(entry ? entry.dateStr : ''),
+            emptyTypeOptions: emptyTypes.map(t => ({ value: t.id, label: t.label }))
+          }),
+          canLiberate,
+          openLiberate: canLiberate ? () => this.openLiberateRequest({ dateStr: entry.dateStr, dateLabel: frToDisplay(entry.dateStr), role: myRoleThisDay.id, roleLabel: myRoleThisDay.label }) : undefined,
+          cellStyle: `position:relative;border:${borderWidth} solid ${borderColor};border-radius:8px;padding:6px;min-height:52px;display:flex;flex-direction:column;gap:2px;background:${bg};opacity:${opacity};` +
+            (isToday ? `box-shadow:0 0 0 2px #B5502E inset;` : ''),
+          astreinteTagStyle: `font-size:9px;font-weight:700;border-radius:20px;padding:1px 6px;display:inline-block;width:fit-content;` +
+            (astreinteIsMe ? `color:#F6EFE4;background:#B5502E;` : `color:#6B5E48;background:#F0E6D3;`)
+        });
+      }
+      weeks.push({ id: 'w' + w, days });
+    }
+
+    return {
+      identityOptions,
+      identityValue: identity,
+      onIdentityChange: (e) => this.setIdentity(e.target.value),
+      isAdminMode: s.isAdminMode,
+      refreshAll: () => this.refreshAll(),
+      refreshBtnStyle: `padding:9px 16px;border-radius:20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;cursor:${s.isRefreshing ? 'default' : 'pointer'};background:transparent;color:#B8A98A;border:1px solid #4A4033;`,
+      refreshIconStyle: `display:inline-block;line-height:1;` + (s.isRefreshing ? `animation:dp-spin 0.7s linear infinite;` : ''),
+      adminBtnLabel: s.isAdminMode ? 'Admin ✓' : 'Administrateur',
+      adminBtnStyle: `padding:9px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;` + (s.isAdminMode ? `background:#B5502E;color:#F6EFE4;` : `background:transparent;color:#B8A98A;border:1px solid #4A4033;`),
+      toggleAdminClick: () => this.toggleAdmin(),
+      navTabs,
+      isDemandes: s.activeTab === 'demandes',
+      isNouvelle: s.activeTab === 'nouvelle',
+      isReglages: s.activeTab === 'reglages',
+
+      demandesCountLabel: demandesList.length + ' demande(s)',
+      hasNoDemandes: demandesList.length === 0,
+      demandesList,
+      demandesSortBy: s.demandesSortBy,
+      onDemandesSortByChange: (e) => this.setDemandesSortBy(e.target.value),
+
+      identityMissing: !identity,
+      identityPresent: !!identity,
+      mesAstreintesList,
+      hasNoMesAstreintes: mesAstreintesList.length === 0,
+      mesDemandesList,
+      hasNoMesDemandes: mesDemandesList.length === 0,
+      isSubmittingRequest: s.isSubmittingRequest,
+
+      planningPrev: () => this.shiftPlanningOffset(-1),
+      planningNext: () => this.shiftPlanningOffset(1),
+      planningPeriodLabel: monthNames[monthDate.getMonth()] + ' ' + monthDate.getFullYear(),
+      planningDayLabels: dayLabels,
+      planningMonthWeeks: weeks,
+
+      scriptUrl: s.scriptUrl,
+      onScriptUrlChange: (e) => this.setScriptUrl(e.target.value),
+      testConnection: () => this.testConnection(),
+      testConnecting: s.testConnecting,
+      viewingDailyCode: s.viewingDailyCode,
+      clearingAll: s.clearingAll,
+      connectionSyncLabel: (s.artisansSyncStatus === 'ok' && s.planningSyncStatus === 'ok') ? 'Connecté · ' + s.artisans.length + ' artisan(s), ' + s.planning.length + ' jour(s), ' + s.demandes.length + ' demande(s)' : (s.artisansSyncStatus === 'erreur' || s.planningSyncStatus === 'erreur') ? 'Échec de connexion' : (s.artisansSyncStatus === 'chargement' || s.planningSyncStatus === 'chargement') ? 'Connexion…' : 'Non testé',
+      testEmailConnection: () => this.testEmailConnection(),
+      emailSyncLabel: s.emailSyncStatus === 'ok' ? 'Connecté' : s.emailSyncStatus === 'erreur' ? 'Échec de connexion' : s.emailSyncStatus === 'chargement' ? 'Connexion…' : 'Non testé',
+
+      showClearAllConfirm: s.showClearAllConfirm,
+      openClearAllConfirm: () => this.openClearAllConfirm(),
+      closeClearAllConfirm: () => this.closeClearAllConfirm(),
+      clearAllDemandes: () => this.clearAllDemandes(),
+      showQuickRequest: !!s.quickRequestDay,
+      quickRequestDateLabel: s.quickRequestDay ? s.quickRequestDay.dateLabel : '',
+      quickRequestArtisan: s.quickRequestArtisan,
+      onQuickRequestArtisanChange: (e) => this.setQuickRequestArtisan(e.target.value),
+      quickRequestTypeOptions: s.quickRequestDay ? s.quickRequestDay.emptyTypeOptions : [],
+      quickRequestType: s.quickRequestType,
+      onQuickRequestTypeChange: (e) => this.setQuickRequestType(e.target.value),
+      quickRequestComment: s.quickRequestComment,
+      onQuickRequestCommentChange: (e) => this.setQuickRequestComment(e.target.value),
+      closeQuickRequest: () => this.closeQuickRequest(),
+      submitQuickRequest: () => this.submitQuickRequest(),
+      submitQuickRequestLabel: s.isSubmittingRequest ? 'Envoi…' : 'Envoyer',
+      submitQuickRequestStyle: `flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;` + (s.isSubmittingRequest ? `opacity:.55;cursor:default;` : `cursor:pointer;`),
+
+      showLiberateRequest: !!s.liberateDay,
+      liberateDateLabel: s.liberateDay ? s.liberateDay.dateLabel : '',
+      liberateRoleLabel: s.liberateDay ? (roleLabelsShort2[s.liberateDay.role] || s.liberateDay.role) : '',
+      liberateComment: s.liberateComment,
+      onLiberateCommentChange: (e) => this.setLiberateComment(e.target.value),
+      closeLiberateRequest: () => this.closeLiberateRequest(),
+      submitLiberateRequest: () => this.submitLiberateRequest(),
+      submitLiberateRequestLabel: s.isSubmittingRequest ? 'Envoi…' : 'Confirmer',
+      submitLiberateRequestStyle: `flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;` + (s.isSubmittingRequest ? `opacity:.55;cursor:default;` : `cursor:pointer;`),
+
+      showAdminPrompt: s.showAdminPrompt,
+      isAdminStepPassword: s.adminStep === 'password',
+      isAdminStepUrl: s.adminStep === 'url',
+      isAdminStepToken: s.adminStep === 'token',
+      adminPasswordInput: s.adminPasswordInput,
+      onAdminPasswordChange: (e) => this.setState({ adminPasswordInput: e.target.value, adminError: false }),
+      adminErrorMsg: s.adminError ? 'Code incorrect' : '',
+      cancelAdminPrompt: () => this.cancelAdminPrompt(),
+      confirmAdminToken: () => this.confirmAdminToken(),
+      resetAppData: () => this.resetAppData(),
+
+      needsAccessCode: !s.deviceToken,
+      isLoadingData: s.isLoadingData,
+      scriptUrlLoading: s.scriptUrlLoading,
+      accessCodeInput: s.accessCodeInput,
+      onAccessCodeChange: (e) => this.setState({ accessCodeInput: e.target.value, accessError: false, accessCodeInvalid: false }),
+      accessPrenomInput: s.accessPrenomInput,
+      onAccessPrenomChange: (e) => this.setState({ accessPrenomInput: e.target.value, accessError: false }),
+      accessDeviceInput: s.accessDeviceInput,
+      onAccessDeviceChange: (e) => this.setState({ accessDeviceInput: e.target.value, accessError: false }),
+      accessErrorMsg: s.accessCodeInvalid ? 'Code incorrect ou déjà utilisé' : (s.accessError ? 'Code, prénom et appareil sont requis' : ''),
+      accessCodeInputStyle: `width:100%;border:1px solid ${s.accessCodeInvalid ? '#B5502E' : '#E7DAC4'};border-radius:10px;padding:11px 14px;font-size:16px;letter-spacing:.1em;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:8px;text-align:center;` + (s.accessCodeInvalid ? 'box-shadow:0 0 0 2px rgba(181,80,46,0.25);' : ''),
+      accessChecking: s.accessChecking,
+      verifyAccessCode: () => this.verifyAccessCode(),
+      verifyAccessCodeStyle: `padding:11px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;` + (s.accessChecking ? `opacity:.55;cursor:default;` : `cursor:pointer;`),
+      adminDailyCode: s.adminDailyCode,
+      viewDailyCode: () => this.viewDailyCode(),
+
+      hasToast: !!s.toast,
+      toastMsg: s.toast || ''
+    };
+  }
+}
+
+</script>
+</body>
+</html>

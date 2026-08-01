@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<template id="__bundler_thumbnail" data-bg-color="#F6EFE4">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="100" fill="#F6EFE4"></rect>
+  <circle cx="50" cy="42" r="18" fill="none" stroke="#B5502E" stroke-width="4"></circle>
+  <text x="50" y="49" font-family="Georgia,serif" font-size="20" fill="#B5502E" text-anchor="middle">A</text>
+</svg>
+</template>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#F6EFE4;font-family:'Manrope',sans-serif;}
+  * { box-sizing:border-box; }
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:#D8C6A5;border-radius:8px;}
+  a{color:#8C3D22;}
+  a:hover{color:#B5502E;}
+  input::placeholder{color:#B0A184;}
+  input:focus{outline:none;}
+  @keyframes suivi-spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+</style>
+</helmet>
+
+<sc-if value="{{ needsAccessCode }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F6EFE4;">
+    <sc-if value="{{ scriptUrlLoading }}" hint-placeholder-val="{{ false }}">
+      <span style="display:inline-block;width:26px;height:26px;border:3px solid #E7DAC4;border-top-color:#B5502E;border-radius:50%;animation:suivi-spin 0.7s linear infinite;"></span>
+    </sc-if>
+    <sc-if value="{{ !scriptUrlLoading }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:16px;padding:32px 30px;width:320px;box-shadow:0 20px 50px rgba(0,0,0,.15);text-align:center;">
+      <div style="width:44px;height:44px;border-radius:50%;background:#B5502E;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:22px;color:#F6EFE4;margin:0 auto 14px;">A</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:6px;">Atelier des Artisans</div>
+      <div style="font-size:13px;color:#8C7C63;margin-bottom:18px;">Entrez le code unique communiqué par l'association (première connexion ou réinitialisation).</div>
+      <input type="text" value="{{ accessCodeInput }}" onChange="{{ onAccessCodeChange }}" placeholder="Code unique" style="{{ accessCodeInputStyle }}">
+      <input type="text" value="{{ accessPrenomInput }}" onChange="{{ onAccessPrenomChange }}" placeholder="Prénom" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:8px;"/>
+      <input type="text" value="{{ accessDeviceInput }}" onChange="{{ onAccessDeviceChange }}" placeholder="Appareil (iPhone, Samsung, PC…)" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:8px;"/>
+      <div style="height:14px;font-size:12px;font-weight:700;color:#B5502E;margin-bottom:10px;">{{ accessErrorMsg }}</div>
+      <div onClick="{{ verifyAccessCode }}" style="{{ verifyAccessCodeStyle }}"><sc-if value="{{ accessChecking }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:14px;height:14px;border:2px solid #F6EFE4;border-top-color:transparent;border-radius:50%;animation:suivi-spin 0.7s linear infinite;margin-right:8px;vertical-align:-2px;"></span></sc-if>Entrer</div>
+    </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ !needsAccessCode }}" hint-placeholder-val="{{ true }}">
+<sc-if value="{{ isLoadingData }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F6EFE4;">
+    <div style="text-align:center;">
+      <div style="font-family:'Instrument Serif',serif;font-size:26px;color:#2B241C;margin-bottom:14px;">Bienvenue</div>
+      <span style="display:inline-block;width:26px;height:26px;border:3px solid #E7DAC4;border-top-color:#B5502E;border-radius:50%;animation:suivi-spin 0.7s linear infinite;"></span>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ !isLoadingData }}" hint-placeholder-val="{{ true }}">
+<div style="width:1180px;height:820px;margin:20px auto;display:flex;background:#F6EFE4;border-radius:22px;overflow:hidden;box-shadow:0 30px 70px -20px rgba(43,36,28,0.35);border:1px solid #E7DAC4;position:relative;">
+
+  <sc-if value="{{ notLoggedIn }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#F6EFE4;padding:40px;">
+    <div style="width:44px;height:44px;border-radius:50%;background:#B5502E;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:22px;color:#F6EFE4;margin-bottom:18px;">A</div>
+    <h1 style="font-family:'Instrument Serif',serif;font-size:28px;color:#2B241C;margin:0 0 6px;font-weight:400;">Connexion</h1>
+    <div style="font-size:13px;color:#8C7C63;margin-bottom:28px;">Entrez votre code PIN à 4 chiffres</div>
+
+    <div style="display:flex;gap:14px;margin-bottom:12px;">
+      <sc-for list="{{ pinDots }}" as="dot" hint-placeholder-count="4">
+        <div style="{{ dot.style }}"></div>
+      </sc-for>
+    </div>
+    <div style="height:18px;font-size:13px;font-weight:700;color:#B5502E;margin-bottom:18px;">{{ pinErrorMsg }}</div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,64px);gap:12px;">
+      <sc-for list="{{ keypadKeys }}" as="key" hint-placeholder-count="12">
+        <div onClick="{{ key.press }}" style="{{ key.style }}">{{ key.label }}</div>
+      </sc-for>
+    </div>
+
+    <div onClick="{{ openAdminPrompt }}" style="position:absolute;bottom:22px;right:26px;font-size:12px;font-weight:600;color:#9C8F79;cursor:pointer;">Administrateur</div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ appVisible }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;flex:1;min-width:0;">
+  <!-- Sidebar -->
+  <div style="width:220px;flex:none;background:#2B241C;color:#F6EFE4;display:flex;flex-direction:column;padding:28px 18px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:36px;">
+      <div style="width:38px;height:38px;border-radius:50%;background:#B5502E;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:20px;color:#F6EFE4;flex:none;">A</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:20px;line-height:1.15;color:#F6EFE4;">Atelier<br>des Artisans</div>
+    </div>
+
+
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:28px;">
+      <div style="{{ sheetStatusDotStyle }}"></div>
+      <div style="font-size:11px;color:#B8A98A;">{{ sheetStatusLabel }}</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <sc-for list="{{ navTabs }}" as="tab" hint-placeholder-count="3">
+        <div onClick="{{ tab.select }}" style="{{ tab.style }}">
+          <div style="width:20px;height:20px;flex:none;" dangerouslySetInnerHTML="{{ tab.iconHtml }}"></div>
+          <div style="font-size:15px;font-weight:600;color:#EADFCB;">{{ tab.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:auto;padding-top:20px;border-top:1px solid #453B2E;">
+      <div style="font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#9C8F79;margin-bottom:6px;">Permanence du jour</div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="font-size:15px;font-weight:700;color:#F6EFE4;">{{ loggedInName }}</div>
+        <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ openSettings }}" title="Réglages" style="width:18px;height:18px;flex:none;color:#9C8F79;cursor:pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </div>
+        </sc-if>
+      </div>
+      <div style="font-size:13px;color:#B8A98A;margin-top:2px;margin-bottom:10px;">{{ todayLabel }}</div>
+      <div style="display:flex;gap:12px;">
+        <sc-if value="{{ showLogout }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ logout }}" style="font-size:12px;color:#C98A6E;font-weight:600;cursor:pointer;">Se déconnecter</div>
+        </sc-if>
+        <sc-if value="{{ showAdminEntry }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ openAdminPrompt }}" style="font-size:12px;color:#9C8F79;font-weight:600;cursor:pointer;">Administrateur</div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;position:relative;">
+
+    <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; left: 32px; right: 32px; bottom: 14px; font-size: 12px; color: #B0A184; line-height: 1.4; text-align: center">℗ L'appli qui répond à vos questions informatiques avant que vos enfants ne se moquent de vous.</div>
+    </sc-if>
+
+    <!-- CAISSE TAB -->
+    <sc-if value="{{ isCaisse }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;display:flex;align-items:flex-start;justify-content:center;padding:50px 24px;overflow-y:auto;">
+        <div style="width:440px;">
+          <h1 style="font-family:'Instrument Serif',serif;font-size:32px;color:#2B241C;margin:0 0 6px;font-weight:400;">Nouvelles ventes</h1>
+          <div style="font-size:13px;color:#8C7C63;margin-bottom:20px;">Ajoutez une ou plusieurs ventes puis enregistrez</div>
+
+          <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:14px 16px;margin-bottom:22px;">
+            <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Fréquentation du jour</div>
+            <sc-if value="{{ hasVisitorCountToday }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:14px;color:#2B241C;">{{ visitorCountTodayLabel }}</div>
+            </sc-if>
+            <sc-if value="{{ !hasVisitorCountToday }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <input type="number" min="0" value="{{ visitorCountInput }}" onChange="{{ onVisitorCountChange }}" placeholder="Nombre de personnes entrées" style="flex:1;border:1px solid #E7DAC4;border-radius:9px;padding:8px 12px;font-size:13px;color:#2B241C;font-family:'Manrope',sans-serif;"/>
+                <div onClick="{{ submitVisitorCount }}" style="{{ submitVisitorCountStyle }}"><sc-if value="{{ visitorCountSubmitting }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:12px;height:12px;border:2px solid #F6EFE4;border-top-color:transparent;border-radius:50%;animation:suivi-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>Enregistrer</div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:14px;">
+            <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="1">
+              <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:14px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                  <select value="{{ ln.buyer }}" onChange="{{ ln.onBuyerChange }}" style="flex:1;min-width:0;border:none;background:transparent;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;padding:4px 0;">
+                    <sc-for list="{{ ln.buyerOptions }}" as="bo" hint-placeholder-count="3">
+                      <option value="{{ bo.value }}">{{ bo.label }}</option>
+                    </sc-for>
+                  </select>
+                  <div onClick="{{ ln.remove }}" style="{{ ln.removeStyle }}">×</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div onClick="{{ ln.openKeypad }}" style="display:flex;align-items:baseline;gap:4px;flex:none;cursor:pointer;">
+                    <div style="width:78px;font-family:'Instrument Serif',serif;font-size:26px;color:#2B241C;">{{ ln.amountLabel }}</div>
+                    <div style="font-family:'Instrument Serif',serif;font-size:20px;color:#9C8F79;">€</div>
+                  </div>
+                  <div style="width:1px;height:24px;background:#E7DAC4;flex:none;"></div>
+                  <div style="display:flex;gap:6px;flex:1;">
+                    <sc-for list="{{ ln.paymentOptions }}" as="pay" hint-placeholder-count="3">
+                      <div onClick="{{ pay.select }}" style="{{ pay.style }}">{{ pay.label }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div onClick="{{ addLine }}" style="display:flex;align-items:center;gap:8px;padding:12px 0;cursor:pointer;color:#8C3D22;font-weight:700;font-size:14px;margin-bottom:20px;">+ Ajouter une vente</div>
+
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:14px 0;border-top:1px solid #E7DAC4;margin-bottom:20px;">
+            <div style="font-size:14px;color:#6B5E48;font-weight:600;">Total de la transaction</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:30px;color:#2B241C;">{{ linesTotalLabel }}</div>
+          </div>
+
+          <div onClick="{{ registerSale }}" style="{{ registerStyle }}">Enregistrer {{ linesTotalLabel }}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- HISTORIQUE TAB -->
+    <sc-if value="{{ isHistorique }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px;min-height:0;">
+        <h1 style="font-family:'Instrument Serif',serif;font-size:32px;color:#2B241C;margin:0 0 6px;font-weight:400;">Historique des ventes</h1>
+        <div style="font-size:13px;color:#8C7C63;margin-bottom:16px;">{{ historyCountLabel }}</div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:18px;">
+          <sc-for list="{{ historyFilters }}" as="hf" hint-placeholder-count="3">
+            <div onClick="{{ hf.select }}" style="{{ hf.style }}">{{ hf.label }}</div>
+          </sc-for>
+          <div onClick="{{ refreshAll }}" style="{{ refreshBtnStyle }}">
+            <div style="{{ refreshIconStyle }}">↻</div>
+            {{ refreshBtnLabel }}
+          </div>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ historyList }}" as="h" hint-placeholder-count="5">
+            <sc-if value="{{ h.isSeparator }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:12px;margin:6px 0 2px;">
+                <div style="flex:1;height:1px;background:#E7DAC4;"></div>
+                <div style="font-size:12px;font-weight:700;color:#8C7C63;text-transform:capitalize;white-space:nowrap;">{{ h.separatorLabel }}</div>
+                <div style="flex:1;height:1px;background:#E7DAC4;"></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ h.isSaleRow }}" hint-placeholder-val="{{ true }}">
+              <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:16px;">
+                <div style="width:52px;flex:none;text-align:center;">
+                  <div style="font-size:11px;color:#9C8F79;text-transform:uppercase;letter-spacing:.03em;">{{ h.dateLabel }}</div>
+                  <div style="font-size:14px;font-weight:700;color:#2B241C;">{{ h.timeLabel }}</div>
+                </div>
+                <div style="width:1px;height:34px;background:#E7DAC4;flex:none;"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:14px;color:#2B241C;font-weight:600;">{{ h.noteLabel }}</div>
+                  <div style="font-size:12px;color:#9C8F79;">{{ h.paymentLabel }}</div>
+                </div>
+                <div style="font-family:'Instrument Serif',serif;font-size:22px;color:#B5502E;flex:none;">{{ h.totalLabel }}</div>
+                <sc-if value="{{ h.canEdit }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ h.openEdit }}" style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#8C3D22;flex:none;">✎</div>
+                </sc-if>
+                <sc-if value="{{ h.canDelete }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ h.requestDelete }}" style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#B5502E;flex:none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- PLANNING TAB -->
+    <sc-if value="{{ isPlanning }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px;min-height:0;overflow-y:auto;">
+        <h1 style="font-family:'Instrument Serif',serif;font-size:32px;color:#2B241C;margin:0 0 6px;font-weight:400;">Planning</h1>
+        <div style="font-size:13px;color:#8C7C63;margin-bottom:20px;">Astreintes et renforts issus du Google Sheet</div>
+
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:16px;">
+          <div style="{{ planningStatusDotStyle }}"></div>
+          <div style="font-size:12px;color:#8C7C63;">{{ planningStatusLabel }}</div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+          <div style="display:flex;gap:8px;">
+            <div onClick="{{ setPlanningWeek }}" style="{{ planningWeekModeStyle }}">Semaine</div>
+            <div onClick="{{ setPlanningMonth }}" style="{{ planningMonthModeStyle }}">Mois</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div onClick="{{ planningPrev }}" style="width:32px;height:32px;border-radius:8px;background:#FFFCF6;border:1px solid #E7DAC4;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6B5E48;font-weight:700;">‹</div>
+            <div style="font-size:14px;font-weight:700;color:#2B241C;min-width:150px;text-align:center;text-transform:capitalize;">{{ planningPeriodLabel }}</div>
+            <div onClick="{{ planningNext }}" style="width:32px;height:32px;border-radius:8px;background:#FFFCF6;border:1px solid #E7DAC4;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6B5E48;font-weight:700;">›</div>
+            <div onClick="{{ planningToday }}" style="padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:#F0E6D3;color:#6B5E48;">Aujourd'hui</div>
+          </div>
+        </div>
+
+        <sc-if value="{{ isPlanningWeek }}" hint-placeholder-val="{{ true }}">
+          <div style="border:1px solid #E7DAC4;border-radius:14px;overflow:hidden;background:#FFFCF6;">
+            <div style="display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;background:#F0E6D3;">
+              <div style="padding:10px 14px;font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;">Jour</div>
+              <div style="padding:10px 14px;font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;">Astreinte</div>
+              <div style="padding:10px 14px;font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;">Renfort 1</div>
+              <div style="padding:10px 14px;font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;">Renfort 2</div>
+            </div>
+            <sc-for list="{{ planningWeekDays }}" as="d" hint-placeholder-count="7">
+              <div style="{{ d.rowStyle }}">
+                <div style="padding:12px 14px;font-size:13px;font-weight:700;color:#2B241C;text-transform:capitalize;">{{ d.dayLabel }} {{ d.dateNum }}</div>
+                <sc-if value="{{ d.isClosed }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:12px 14px;font-size:12px;font-weight:700;color:#B0A184;grid-column:span 3;">Fermé</div>
+                </sc-if>
+                <sc-if value="{{ d.showRoles }}" hint-placeholder-val="{{ true }}">
+                  <div style="{{ d.astreinteCellStyle }}">
+                    <sc-if value="{{ d.astreinte }}" hint-placeholder-val="{{ false }}">
+                      <span style="{{ d.astreinteTagStyle }}">{{ d.astreinte }}</span>
+                    </sc-if>
+                  </div>
+                  <div style="padding:12px 14px;font-size:13px;color:#6B5E48;">{{ d.renfort1 }}</div>
+                  <div style="padding:12px 14px;font-size:13px;color:#6B5E48;">{{ d.renfort2 }}</div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isPlanningMonth }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;">
+            <sc-for list="{{ planningDayLabels }}" as="dl" hint-placeholder-count="7">
+              <div style="font-size:11px;font-weight:700;color:#6B5E48;text-align:center;text-transform:uppercase;letter-spacing:.03em;">{{ dl }}</div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <sc-for list="{{ planningMonthWeeks }}" as="w" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">
+                <sc-for list="{{ w.days }}" as="d" hint-placeholder-count="7">
+                  <div style="{{ d.cellStyle }}">
+                    <div style="font-size:11px;color:#9C8F79;">{{ d.dateNum }}</div>
+                    <sc-if value="{{ d.isClosed }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:11px;font-weight:700;color:#B0A184;">Fermé</div>
+                    </sc-if>
+                    <sc-if value="{{ d.astreinte }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-top:2px;"><span style="{{ d.astreinteMonthStyle }}">{{ d.astreinte }}</span></div>
+                    </sc-if>
+                    <sc-if value="{{ d.renfort1 }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:10px;color:#8C7C63;">+ {{ d.renfort1 }}</div>
+                    </sc-if>
+                    <sc-if value="{{ d.renfort2 }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:10px;color:#8C7C63;">+ {{ d.renfort2 }}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- REGLEMENTS TAB -->
+    <sc-if value="{{ isReglements }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px;min-height:0;overflow-y:auto;">
+        <h1 style="font-family:'Instrument Serif',serif;font-size:32px;color:#2B241C;margin:0 0 6px;font-weight:400;">Règlements</h1>
+        <div style="font-size:13px;color:#8C7C63;margin-bottom:20px;">Virements carte et remises cash, par artisan et par mois</div>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:20px;">
+          <div onClick="{{ reglementsPrev }}" style="width:32px;height:32px;border-radius:8px;background:#FFFCF6;border:1px solid #E7DAC4;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6B5E48;font-weight:700;">‹</div>
+          <div style="font-size:14px;font-weight:700;color:#2B241C;min-width:150px;text-align:center;text-transform:capitalize;">{{ reglementsPeriodLabel }}</div>
+          <div onClick="{{ reglementsNext }}" style="width:32px;height:32px;border-radius:8px;background:#FFFCF6;border:1px solid #E7DAC4;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6B5E48;font-weight:700;">›</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;">
+          <div style="background:#2B241C;border-radius:14px;padding:16px 18px;">
+            <div style="font-size:11px;color:#B8A98A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Total à virer</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:24px;color:#F6EFE4;">{{ reglementsTotalVirerLabel }}</div>
+          </div>
+          <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:16px 18px;">
+            <div style="font-size:11px;color:#9C8F79;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Total espèces à donner</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:24px;color:#2B241C;">{{ reglementsTotalCashLabel }}</div>
+          </div>
+          <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:16px 18px;">
+            <div style="font-size:11px;color:#9C8F79;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Total chèques à remettre</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:24px;color:#2B241C;">{{ reglementsTotalChequeLabel }}</div>
+          </div>
+          <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:16px 18px;">
+            <div style="font-size:11px;color:#9C8F79;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Artisans en attente</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:24px;color:#2B241C;">{{ reglementsEnAttenteLabel }}</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:#9C8F79;text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px;">Frais prélevés ce mois : {{ reglementsTotalFraisLabel }}</div>
+
+        <sc-if value="{{ reglementsLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#9C8F79;">Chargement…</div>
+        </sc-if>
+        <sc-if value="{{ reglementsEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#9C8F79;margin-bottom:14px;">Aucune ligne pour cette période</div>
+        </sc-if>
+        <div onClick="{{ generateReglements }}" style="{{ generateReglementsStyle }}"><sc-if value="{{ reglementsGenerating }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:12px;height:12px;border:2px solid #6B5E48;border-top-color:transparent;border-radius:50%;animation:suivi-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>Générer les lignes de ce mois</div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ reglementsRows }}" as="r" hint-placeholder-count="2">
+            <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:180px;">
+                <div style="font-size:15px;font-weight:700;color:#2B241C;margin-bottom:4px;">{{ r.nom }}</div>
+                <div style="font-size:12px;color:#9C8F79;">{{ r.contextLabel }}</div>
+              </div>
+              <div style="text-align:right;min-width:110px;">
+                <div style="font-size:11px;color:#9C8F79;text-transform:uppercase;letter-spacing:.04em;">Frais / Net à virer</div>
+                <div style="font-size:14px;color:#2B241C;">{{ r.fraisLabel }} · <b>{{ r.netLabel }}</b></div>
+              </div>
+              <div onClick="{{ r.toggleVirement }}" style="{{ r.virementBadgeStyle }}"><sc-if value="{{ r.virementPending }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:10px;height:10px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:suivi-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>{{ r.statutVirement }}</div>
+              <div onClick="{{ r.toggleCash }}" style="{{ r.cashBadgeStyle }}"><sc-if value="{{ r.cashPending }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:10px;height:10px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:suivi-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>{{ r.statutCash }}</div>
+              <div onClick="{{ r.toggleCheque }}" style="{{ r.chequeBadgeStyle }}"><sc-if value="{{ r.chequePending }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;width:10px;height:10px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:suivi-spin 0.7s linear infinite;margin-right:6px;vertical-align:-1px;"></span></sc-if>{{ r.statutCheque }}</div>
+              <div style="min-width:120px;text-align:right;font-size:11px;color:#9C8F79;">{{ r.datesLabel }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- EXPORT TAB -->
+    <sc-if value="{{ isExport }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px;min-height:0;overflow-y:auto;">
+        <h1 style="font-family:'Instrument Serif',serif;font-size:32px;color:#2B241C;margin:0 0 6px;font-weight:400;">Comptabilité</h1>
+        <sc-if value="{{ showExportScopePicker }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:24px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:22px;background:#EFE6D3;border:1px solid #E1D3B4;border-radius:14px;padding:16px 18px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Périmètre</div>
+              <select value="{{ exportArtisanFilter }}" onChange="{{ onExportArtisanFilterChange }}" style="border:1px solid #E7DAC4;border-radius:10px;padding:10px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;background:#fff;">
+                <sc-for list="{{ exportArtisanOptions }}" as="eo" hint-placeholder-count="3">
+                  <option value="{{ eo.value }}">{{ eo.label }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="margin-left:auto;">
+              <div style="font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;text-align:right;">Période</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+                <sc-for list="{{ exportPeriodFilters }}" as="pf" hint-placeholder-count="4">
+                  <div onClick="{{ pf.select }}" style="{{ pf.style }}">{{ pf.label }}</div>
+                </sc-for>
+                <sc-if value="{{ showCustomPeriod }}" hint-placeholder-val="{{ false }}">
+                  <input type="date" value="{{ exportCustomStart }}" onChange="{{ onExportCustomStart }}" style="border:1px solid #E7DAC4;border-radius:8px;padding:9px 10px;font-size:12px;color:#2B241C;font-family:'Manrope',sans-serif;background:#fff;">
+                  <input type="date" value="{{ exportCustomEnd }}" onChange="{{ onExportCustomEnd }}" style="border:1px solid #E7DAC4;border-radius:8px;padding:9px 10px;font-size:12px;color:#2B241C;font-family:'Manrope',sans-serif;background:#fff;">
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showExportScopePicker }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:13px;color:#8C7C63;margin-bottom:22px;">{{ exportScopeLabel }}</div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
+          <div style="background:#2B241C;border-radius:14px;padding:18px 20px;">
+            <div style="font-size:12px;color:#B8A98A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Total des ventes</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:30px;color:#F6EFE4;">{{ exportTotalLabel }}</div>
+          </div>
+          <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:18px 20px;">
+            <div style="font-size:12px;color:#9C8F79;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Transactions</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:30px;color:#2B241C;">{{ exportCountLabel }}</div>
+          </div>
+          <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:18px 20px;">
+            <div style="font-size:12px;color:#9C8F79;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Panier moyen</div>
+            <div style="font-family:'Instrument Serif',serif;font-size:30px;color:#2B241C;">{{ exportAvgLabel }}</div>
+          </div>
+        </div>
+
+        <div style="font-size:13px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Répartition par moyen de paiement</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:26px;">
+          <sc-for list="{{ byPayment }}" as="bp" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:100px;font-size:14px;color:#2B241C;font-weight:600;">{{ bp.label }}</div>
+              <div style="flex:1;height:10px;background:#EFE6D3;border-radius:6px;overflow:hidden;">
+                <div style="{{ bp.barStyle }}"></div>
+              </div>
+              <div style="width:80px;text-align:right;font-size:14px;font-weight:700;color:#2B241C;">{{ bp.amountLabel }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ showExportScopePicker }}" hint-placeholder-val="{{ false }}">
+          <div style="height:1px;background:#E7DAC4;margin:4px 0 22px;"></div>
+          <div style="font-size:13px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Ventes par artisan</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:26px;">
+            <sc-for list="{{ artisanBarData }}" as="ab" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:140px;font-size:14px;color:#2B241C;font-weight:600;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">{{ ab.name }}</div>
+                <div style="flex:1;height:10px;background:#EFE6D3;border-radius:6px;overflow:hidden;">
+                  <div style="{{ ab.barStyle }}"></div>
+                </div>
+                <div style="width:80px;text-align:right;font-size:14px;font-weight:700;color:#2B241C;">{{ ab.amountLabel }}</div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noArtisanBarData }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:13px;color:#9C8F79;">Aucune vente sur cette période</div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;gap:12px;">
+          <div style="position:relative;">
+            <div onClick="{{ onExportClick }}" onMouseDown="{{ startExportPress }}" onMouseUp="{{ endExportPress }}" onMouseLeave="{{ endExportPress }}" onTouchStart="{{ startExportPress }}" onTouchEnd="{{ endExportPress }}" style="padding:13px 22px;border-radius:10px;background:#FFFCF6;border:1px solid #C9A15A;color:#8C3D22;font-weight:700;font-size:14px;cursor:pointer;user-select:none;">Exporter en Excel</div>
+            <sc-if value="{{ showExportMenu }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ closeExportMenu }}" style="position:fixed;inset:0;z-index:5;"></div>
+              <div style="position:absolute;bottom:calc(100% + 8px);left:0;background:#FFFCF6;border:1px solid #E7DAC4;border-radius:10px;box-shadow:0 12px 30px rgba(43,36,28,.2);padding:6px;min-width:180px;z-index:6;">
+                <div onClick="{{ exportCsv }}" style="padding:10px 12px;border-radius:8px;font-size:13px;font-weight:600;color:#6B5E48;cursor:pointer;white-space:nowrap;">Exporter en CSV</div>
+              </div>
+            </sc-if>
+          </div>
+          <div onClick="{{ exportPdf }}" style="padding:13px 22px;border-radius:10px;background:#B5502E;color:#FFFCF6;font-weight:700;font-size:14px;cursor:pointer;">Exporter en PDF</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- SETTINGS TAB -->
+    <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px;min-height:0;overflow-y:auto;">
+        <h1 style="font-family:'Instrument Serif',serif;font-size:32px;color:#2B241C;margin:0 0 6px;font-weight:400;">Réglages</h1>
+        <div style="font-size:13px;color:#8C7C63;margin-bottom:24px;">Paramètres techniques réservés à <b><u>Loann<span style="font-weight: 400;">&nbsp;(pas touche à mes paramètres XD)</span></u></b></div>
+
+        <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:18px 20px;margin-bottom:24px;">
+          <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">SYNCHRONISATION GOOGLE SHEET</div>
+          <div style="font-size:12px;color:#9C8F79;margin-bottom:10px;">Collez ici l'URL de déploiement du script Google Apps Script (un seul classeur, un seul script pour Ventes, Artisans et Planning)</div>
+          <input type="text" placeholder="https://script.google.com/macros/s/…/exec" value="{{ scriptUrl }}" onChange="{{ onScriptUrlChange }}" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:13px;color:#2B241C;font-family:'Manrope',sans-serif;background:#fff;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div onClick="{{ testConnection }}" style="padding:9px 16px;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:12px;cursor:pointer;">Tester la connexion</div>
+            <div style="font-size:12px;font-weight:600;color:#9C8F79;">{{ syncLabel }}</div>
+          </div>
+        </div>
+
+        <div onClick="{{ closeSettings }}" style="align-self:flex-start;padding:10px 18px;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">← Retour</div>
+      </div>
+    </sc-if>
+
+    <!-- ARTISANS TAB -->
+    <sc-if value="{{ isArtisans }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px;min-height:0;overflow-y:auto;">
+        <h1 style="font-family:'Instrument Serif',serif;font-size:32px;color:#2B241C;margin:0 0 6px;font-weight:400;">Artisans</h1>
+        <div style="font-size:13px;color:#8C7C63;margin-bottom:24px;">{{ artisanCountLabel }}</div>
+
+        <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#2B241C;border-radius:14px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#F6EFE4;margin-bottom:2px;">Identification par code PIN</div>
+            <div style="font-size:12px;color:#B8A98A;">Désactivée : la caisse est accessible directement, sans connexion</div>
+          </div>
+          <div onClick="{{ togglePinAuth }}" style="{{ pinToggleStyle }}">
+            <div style="{{ pinToggleKnobStyle }}"></div>
+          </div>
+        </div>
+
+        <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:14px;padding:18px 20px;margin-bottom:24px;">
+          <div style="font-size:12px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Nouveau profil</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <input type="text" placeholder="Prénom" value="{{ newArtisanPrenom }}" onChange="{{ onNewArtisanPrenom }}" style="border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;background:#fff;">
+            <input type="text" placeholder="Nom" value="{{ newArtisanNom }}" onChange="{{ onNewArtisanNom }}" style="border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;background:#fff;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+            <input type="email" placeholder="Adresse e-mail" value="{{ newArtisanEmail }}" onChange="{{ onNewArtisanEmail }}" style="border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;background:#fff;">
+            <input type="text" inputMode="numeric" placeholder="Code PIN (4 chiffres)" value="{{ newArtisanPin }}" onChange="{{ onNewArtisanPin }}" style="border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;background:#fff;">
+          </div>
+          <div onClick="{{ addArtisan }}" style="display:inline-block;padding:11px 22px;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:14px;cursor:pointer;">Ajouter le profil</div>
+        </div>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ artisanList }}" as="ar" hint-placeholder-count="2">
+            <div style="background:#FFFCF6;border:1px solid #E7DAC4;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:14px;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#B5502E;color:#FFFCF6;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:16px;flex:none;">{{ ar.initials }}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:14px;font-weight:700;color:#2B241C;">{{ ar.prenom }} {{ ar.nom }}</div>
+                <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px;color:#9C8F79;">{{ ar.email }} · PIN {{ ar.pin }}</div>
+                </sc-if>
+              </div>
+              <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ ar.remove }}" style="width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#B0A184;cursor:pointer;flex:none;">×</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:#2B241C;color:#F6EFE4;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);">{{ toastMsg }}</div>
+    </sc-if>
+  </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ hasWelcome }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:10;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:32px 44px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="font-family:'Instrument Serif',serif;font-size:30px;color:#2B241C;">{{ welcomeMsg }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showEditSale }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:20;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:26px 28px;width:340px;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="font-family:'Instrument Serif',serif;font-size:22px;color:#2B241C;margin-bottom:16px;">Modifier la vente</div>
+
+        <div style="font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Artisan</div>
+        <select value="{{ editBuyer }}" onChange="{{ onEditBuyerChange }}" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;background:#fff;margin-bottom:14px;">
+          <sc-for list="{{ editBuyerOptions }}" as="bo" hint-placeholder-count="3">
+            <option value="{{ bo.value }}">{{ bo.label }}</option>
+          </sc-for>
+        </select>
+
+        <div style="font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Montant</div>
+        <div onClick="{{ openEditAmountKeypad }}" style="display:flex;align-items:baseline;gap:6px;border:1px solid #E7DAC4;border-radius:10px;padding:10px 14px;cursor:pointer;margin-bottom:14px;">
+          <div style="font-family:'Instrument Serif',serif;font-size:24px;color:#2B241C;">{{ editAmountLabel }}</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:18px;color:#9C8F79;">€</div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:#6B5E48;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Paiement</div>
+        <div style="display:flex;gap:6px;margin-bottom:20px;">
+          <sc-for list="{{ editPaymentOptions }}" as="pay" hint-placeholder-count="3">
+            <div onClick="{{ pay.select }}" style="{{ pay.style }}">{{ pay.label }}</div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <div onClick="{{ closeEditSale }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">Annuler</div>
+          <div onClick="{{ saveEditSale }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;cursor:pointer;">Enregistrer</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showConfirmDeleteSale }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:20;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:26px 28px;width:340px;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="font-family:'Instrument Serif',serif;font-size:22px;color:#2B241C;margin-bottom:10px;">Supprimer la vente ?</div>
+        <div style="font-size:13px;color:#6B5E48;margin-bottom:20px;">{{ confirmDeleteSaleLabel }} — cette action supprime définitivement la vente du Sheet.</div>
+        <div style="display:flex;gap:8px;">
+          <div onClick="{{ closeConfirmDeleteSale }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">Annuler</div>
+          <div onClick="{{ performDeleteSale }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#B5502E;color:#F6EFE4;font-weight:700;font-size:13px;cursor:pointer;">Supprimer</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showAmountKeypad }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:20;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:26px 30px;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="text-align:center;font-family:'Instrument Serif',serif;font-size:34px;color:#2B241C;margin-bottom:16px;">{{ amountBufferLabel }}</div>
+        <div style="display:grid;grid-template-columns:repeat(3,64px);gap:12px;margin-bottom:16px;">
+          <sc-for list="{{ amountKeypadKeys }}" as="key" hint-placeholder-count="12">
+            <div onClick="{{ key.press }}" style="{{ key.style }}">{{ key.label }}</div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div onClick="{{ cancelAmountKeypad }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">Annuler</div>
+          <div onClick="{{ confirmAmount }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;cursor:pointer;">Valider</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showConfirmArtisan }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:20;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:26px 28px;width:340px;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="font-family:'Instrument Serif',serif;font-size:22px;color:#2B241C;margin-bottom:6px;">Vérifier le profil</div>
+        <div style="font-size:13px;color:#8C7C63;margin-bottom:18px;">Confirmez les informations avant de les envoyer</div>
+        <div style="background:#F6EFE4;border:1px solid #E7DAC4;border-radius:12px;padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#9C8F79;">Prénom</span><span style="color:#2B241C;font-weight:700;">{{ confirmArtisanPrenom }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#9C8F79;">Nom</span><span style="color:#2B241C;font-weight:700;">{{ confirmArtisanNom }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#9C8F79;">E-mail</span><span style="color:#2B241C;font-weight:700;">{{ confirmArtisanEmail }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:#9C8F79;">Code PIN</span><span style="color:#2B241C;font-weight:700;">{{ confirmArtisanPin }}</span></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div onClick="{{ closeConfirmArtisan }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">Corriger</div>
+          <div onClick="{{ validateAddArtisan }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;cursor:pointer;">Valider</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showAdminPrompt }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(43,36,28,0.55);display:flex;align-items:center;justify-content:center;z-index:20;">
+      <div style="background:#FFFCF6;border-radius:16px;padding:28px 30px;width:300px;box-shadow:0 20px 50px rgba(0,0,0,.3);">
+        <div style="font-family:'Instrument Serif',serif;font-size:22px;color:#2B241C;margin-bottom:14px;">Accès administrateur</div>
+        <input type="password" placeholder="Code administrateur" value="{{ adminPassword }}" onChange="{{ onAdminPasswordChange }}" style="width:100%;border:1px solid #E7DAC4;border-radius:10px;padding:11px 14px;font-size:14px;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:8px;">
+        <div style="height:16px;font-size:12px;font-weight:700;color:#B5502E;margin-bottom:12px;">{{ adminErrorMsg }}</div>
+        <div style="display:flex;gap:8px;">
+          <div onClick="{{ closeAdminPrompt }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;cursor:pointer;">Annuler</div>
+          <div onClick="{{ attemptAdminLogin }}" style="flex:1;text-align:center;padding:10px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;cursor:pointer;">Valider</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ICONS = {
+  caisse: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/><path d="M3 13h18"/></svg>',
+  historique: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
+  export: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="16" y1="18" x2="16" y2="18.01"/><line x1="12" y1="18" x2="12" y2="18.01"/><line x1="8" y1="18" x2="8" y2="18.01"/></svg>',
+  artisans: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>',
+  planning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>',
+  reglements: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/><circle cx="12" cy="14.5" r="2"/></svg>'
+};
+
+function parseFrDate(str) {
+  if (!str) return null;
+  const parts = String(str).split('/');
+  if (parts.length === 3 && parts[0].length <= 2) {
+    return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+  }
+  const native = new Date(str);
+  return isNaN(native) ? null : native;
+}
+function rowToPlanning(row) {
+  return {
+    ts: parseFrDate(row.date),
+    fermeture: !!row.fermeture,
+    jour: row.jour,
+    astreinte: row.astreinte,
+    renfort1: row.renfort1,
+    renfort2: row.renfort2
+  };
+}
+
+function eur(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+
+function rowToSale(row) {
+  return {
+    id: row.id,
+    ts: new Date(row.iso),
+    buyer: row.artisan,
+    total: parseFloat(String(row.montant).toString().replace(',', '.')) || 0,
+    payment: row.paiement,
+    loggedBy: row.saisiPar
+  };
+}
+
+class Component extends DCLogic {
+  state = {
+    activeTab: 'caisse',
+    lines: [{ id: 'l0', amount: '', buyer: '', payment: '' }],
+    toastMsg: null,
+    historyFilter: 'tout',
+    newArtisan: { prenom: '', nom: '', email: '', pin: '' },
+    artisans: [],
+    artisansSyncStatus: '',
+    isLoggedIn: false,
+    isAdmin: false,
+    loggedInArtisan: null,
+    pinInput: '',
+    pinError: false,
+    welcomeMsg: null,
+    lastAutoLogoutDate: null,
+    showAdminPrompt: false,
+    adminPassword: '',
+    adminError: false,
+    pinAuthEnabled: false,
+    activeAmountLineId: null,
+    amountBuffer: '',
+    scriptUrl: localStorage.getItem('suivi-ventes-script-url') || localStorage.getItem('suivi-ventes-planning-script-url') || '',
+    scriptUrlLoading: false,
+    adminToken: localStorage.getItem('app-admin-token') || '',
+    deviceToken: localStorage.getItem('app-device-token') || '',
+    accessCodeInput: '',
+    accessPrenomInput: '',
+    accessDeviceInput: '',
+    accessChecking: false,
+    accessError: false,
+    isLoadingData: false,
+    exportArtisanFilter: '',
+    exportPeriod: 'jour',
+    exportCustomStart: '',
+    exportCustomEnd: '',
+    planning: [],
+    planningSyncStatus: '',
+    frequentation: [],
+    visitorCountInput: '',
+    visitorCountSubmitting: false,
+    reglementsGenerating: false,
+    reglementsPending: {},
+    planningViewMode: 'mois',
+    planningOffset: 0,
+    reglements: [],
+    reglementsOffset: 0,
+    reglementsSyncStatus: '',
+    pendingSales: JSON.parse(localStorage.getItem('suivi-ventes-pending') || '[]').map(p => ({ ...p, ts: new Date(p.ts) })),
+    salesSyncStatus: '',
+    editingSale: null,
+    confirmDeleteSale: null,
+    history: [
+      { id: 'h1', ts: new Date(new Date().setHours(10, 15)), buyer: 'Mme Lefèvre', total: 48, payment: 'Espèces', loggedBy: 'Claire Moreau' },
+      { id: 'h2', ts: new Date(new Date().setHours(11, 3)), buyer: 'Vente', total: 36, payment: 'Carte', loggedBy: 'Claire Moreau' },
+      { id: 'h3', ts: new Date(new Date().setHours(13, 40)), buyer: 'M. Dubois', total: 42, payment: 'Carte', loggedBy: 'Julien Petit' },
+      { id: 'h4', ts: new Date(new Date(Date.now() - 86400000).setHours(15, 20)), buyer: 'Vente', total: 28, payment: 'Espèces', loggedBy: 'Julien Petit' },
+      { id: 'h5', ts: new Date(new Date(Date.now() - 86400000).setHours(16, 50)), buyer: 'Mme Aubert', total: 56, payment: 'Chèque', loggedBy: 'Claire Moreau' }
+    ]
+  };
+
+  componentDidMount() {
+    this._logoutInterval = setInterval(() => this.checkAutoLogout(), 30000);
+    const proceed = () => {
+      if (this.state.scriptUrl && this.state.deviceToken) {
+        this.setState({ isLoadingData: true });
+        Promise.all([this.fetchArtisans(), this.fetchSales(), this.fetchPlanning(), this.fetchFrequentation()]).then(() => this.setState({ isLoadingData: false }));
+        this.flushPending_();
+      }
+    };
+    if (this.state.scriptUrl) { proceed(); return; }
+    this.setState({ scriptUrlLoading: true });
+    fetch('./script-url.txt').then(r => r.text()).then(t => {
+      const url = (t || '').trim();
+      if (url) localStorage.setItem('suivi-ventes-script-url', url);
+      this.setState({ scriptUrl: url, scriptUrlLoading: false });
+      proceed();
+    }).catch(() => this.setState({ scriptUrlLoading: false }));
+  }
+  fetchFrequentation() {
+    if (!this.state.scriptUrl) return Promise.resolve();
+    return fetch(this.urlWithSheet_(this.state.scriptUrl, 'frequentation'))
+      .then(r => r.json())
+      .then(list => this.setState({ frequentation: Array.isArray(list) ? list : [] }))
+      .catch(() => {});
+  }
+  setVisitorCountInput(v) { this.setState({ visitorCountInput: v }); }
+  submitVisitorCount() {
+    const n = parseInt(this.state.visitorCountInput, 10);
+    if (!(n > 0)) { this.showToast('Entrez un nombre valide'); return; }
+    if (this.state.visitorCountSubmitting) return;
+    const todayStr = new Date().toLocaleDateString('fr-FR');
+    this.setState({ visitorCountSubmitting: true });
+    fetch(this.state.scriptUrl, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'frequentation', action: 'set', date: todayStr, nombre: n, saisiPar: this.state.loggedInArtisan ? (this.state.loggedInArtisan.prenom + ' ' + this.state.loggedInArtisan.nom).trim() : '', deviceToken: this.state.deviceToken })
+    }).then(r => r.json()).then(res => {
+      this.setState({ visitorCountSubmitting: false });
+      if (res && res.ok) {
+        this.setState({ frequentation: res.list, visitorCountInput: '' });
+        this.showToast('Fréquentation enregistrée');
+      } else {
+        this.showToast(res && res.error ? res.error : "Échec de l'enregistrement");
+      }
+    }).catch(() => { this.setState({ visitorCountSubmitting: false }); this.showToast("Échec de l'enregistrement"); });
+  }
+
+  fetchPlanning() {
+    if (!this.state.scriptUrl) return Promise.resolve();
+    this.setState({ planningSyncStatus: 'chargement' });
+    return fetch(this.urlWithSheet_(this.state.scriptUrl, 'planning'))
+      .then(r => r.json())
+      .then(list => this.setState({ planning: Array.isArray(list) ? list.map(rowToPlanning) : [], planningSyncStatus: Array.isArray(list) ? 'ok' : 'erreur' }))
+      .catch(() => this.setState({ planningSyncStatus: 'erreur' }));
+  }
+  setPlanningViewMode(mode) { this.setState({ planningViewMode: mode, planningOffset: 0 }); }
+  shiftPlanningOffset(delta) { this.setState(s => ({ planningOffset: s.planningOffset + delta })); }
+
+  reglementsPeriode_(offset) {
+    const now = new Date();
+    const d = new Date(now.getFullYear(), now.getMonth() + (offset != null ? offset : this.state.reglementsOffset), 1);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  }
+  fetchReglements() {
+    if (!this.state.scriptUrl || !this.state.adminToken) return Promise.resolve();
+    const periode = this.reglementsPeriode_();
+    this.setState({ reglementsSyncStatus: 'chargement' });
+    const url = this.state.scriptUrl + '?sheet=reglements&app=ventes&deviceToken=' + encodeURIComponent(this.state.deviceToken) + '&adminToken=' + encodeURIComponent(this.state.adminToken) + '&periode=' + periode;
+    return fetch(url).then(r => r.json()).then(list => this.setState({ reglements: Array.isArray(list) ? list : [], reglementsSyncStatus: 'ok' })).catch(() => this.setState({ reglementsSyncStatus: 'erreur' }));
+  }
+  shiftReglementsOffset(delta) { this.setState(s => ({ reglementsOffset: s.reglementsOffset + delta }), () => this.fetchReglements()); }
+  generateReglements() {
+    if (this.state.reglementsGenerating) return;
+    const modifiePar = this.state.loggedInArtisan ? (this.state.loggedInArtisan.prenom + ' ' + (this.state.loggedInArtisan.nom || '')).trim() : 'Administrateur';
+    this.setState({ reglementsGenerating: true });
+    fetch(this.state.scriptUrl, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'reglements', action: 'generate', periode: this.reglementsPeriode_(), app: 'ventes', deviceToken: this.state.deviceToken, adminToken: this.state.adminToken, modifiePar })
+    }).then(r => r.json()).then(list => { this.setState({ reglements: Array.isArray(list) ? list : [], reglementsGenerating: false }); this.showToast('Lignes générées'); }).catch(() => { this.setState({ reglementsGenerating: false }); this.showToast('Échec de la génération'); });
+  }
+  toggleVirementStatut(row) {
+    if (this.state.reglementsPending[row.id + ':virement']) return;
+    const next = row.statutVirement === 'Viré' ? 'À virer' : 'Viré';
+    this.postReglementStatut_(row.id, 'virement', next);
+  }
+  toggleCashStatut(row) {
+    if (this.state.reglementsPending[row.id + ':cash']) return;
+    const next = row.statutCash === 'Donné' ? 'À donner' : 'Donné';
+    this.postReglementStatut_(row.id, 'cash', next);
+  }
+  toggleChequeStatut(row) {
+    if (this.state.reglementsPending[row.id + ':cheque']) return;
+    const next = row.statutCheque === 'Remis' ? 'À remettre' : 'Remis';
+    this.postReglementStatut_(row.id, 'cheque', next);
+  }
+  postReglementStatut_(id, type, statut) {
+    const modifiePar = this.state.loggedInArtisan ? (this.state.loggedInArtisan.prenom + ' ' + (this.state.loggedInArtisan.nom || '')).trim() : 'Administrateur';
+    const dateReelle = new Date().toLocaleDateString('fr-FR');
+    const key = id + ':' + type;
+    this.setState(s => ({ reglementsPending: { ...s.reglementsPending, [key]: true } }));
+    fetch(this.state.scriptUrl, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'reglements', action: 'updateStatut', id, type, statut, dateReelle, modifiePar, periode: this.reglementsPeriode_(), app: 'ventes', deviceToken: this.state.deviceToken, adminToken: this.state.adminToken })
+    }).then(r => r.json()).then(list => this.setState(s => { const p = { ...s.reglementsPending }; delete p[key]; return { reglements: Array.isArray(list) ? list : [], reglementsPending: p }; }))
+      .catch(() => { this.setState(s => { const p = { ...s.reglementsPending }; delete p[key]; return { reglementsPending: p }; }); this.showToast('Échec de la mise à jour du règlement'); });
+  }
+
+  savePending_(list) {
+    localStorage.setItem('suivi-ventes-pending', JSON.stringify(list));
+    this.setState({ pendingSales: list });
+  }
+  flushPending_() {
+    if (!this.state.scriptUrl || !this.state.pendingSales.length) return;
+    const queue = this.state.pendingSales;
+    queue.reduce((chain, entry) => chain.then(() => this.pushToSheet(entry)), Promise.resolve())
+      .then(() => {
+        this.savePending_([]);
+        this.fetchSales();
+        this.showToast(queue.length + ' vente(s) en attente envoyée(s) au Google Sheet');
+      })
+      .catch(() => this.showToast("Échec d'envoi des ventes en attente — nouvel essai à la prochaine synchro"));
+  }
+
+  urlWithSheet_(url, which) {
+    return url + (url.includes('?') ? '&' : '?') + 'sheet=' + which + '&deviceToken=' + encodeURIComponent(this.state.deviceToken);
+  }
+  verifyAccessCode() {
+    const url = this.state.scriptUrl;
+    if (!url) { this.setState({ accessError: true }); return; }
+    if (!this.state.accessPrenomInput.trim() || !this.state.accessDeviceInput.trim()) { this.setState({ accessError: true, accessCodeInvalid: false }); return; }
+    this.setState({ accessChecking: true, accessError: false, accessCodeInvalid: false });
+    fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'access', action: 'enroll', app: 'ventes', dailyCode: this.state.accessCodeInput, prenom: this.state.accessPrenomInput.trim(), deviceLabel: this.state.accessDeviceInput.trim() })
+    }).then(r => r.json()).then(res => {
+      if (res && res.ok) {
+        localStorage.setItem('app-device-token', res.deviceToken);
+        this.setState({ deviceToken: res.deviceToken, accessChecking: false, accessCodeInput: '', isLoadingData: true });
+        Promise.all([this.fetchArtisans(), this.fetchSales(), this.fetchPlanning(), this.fetchFrequentation()]).then(() => this.setState({ isLoadingData: false }));
+        this.flushPending_();
+      } else {
+        this.setState({ accessChecking: false, accessError: true, accessCodeInvalid: true });
+      }
+    }).catch(() => { this.setState({ accessChecking: false, accessError: true }); });
+  }
+  handleAccessRejected_() {
+    localStorage.removeItem('app-device-token');
+    this.setState({ deviceToken: '', artisans: [], history: [], planning: [], artisansSyncStatus: 'erreur', salesSyncStatus: 'erreur', planningSyncStatus: 'erreur' });
+    this.showToast('Accès révoqué — ressaisissez le code unique');
+  }
+
+  fetchArtisans() {
+    if (!this.state.scriptUrl) return Promise.resolve();
+    this.setState({ artisansSyncStatus: 'chargement' });
+    return fetch(this.urlWithSheet_(this.state.scriptUrl, 'artisans'))
+      .then(r => r.json())
+      .then(list => {
+        if (!Array.isArray(list)) { this.handleAccessRejected_(); return; }
+        this.setState({ artisans: list, artisansSyncStatus: 'ok' });
+      })
+      .catch(() => this.setState({ artisansSyncStatus: 'erreur' }));
+  }
+
+  fetchSales() {
+    if (!this.state.scriptUrl) return Promise.resolve();
+    this.setState({ salesSyncStatus: 'chargement' });
+    return fetch(this.urlWithSheet_(this.state.scriptUrl, 'ventes'))
+      .then(r => r.json())
+      .then(rows => this.setState({ history: rows.map(rowToSale), salesSyncStatus: 'ok' }))
+      .catch(() => this.setState({ salesSyncStatus: 'erreur' }));
+  }
+
+  testConnection() {
+    if (!this.state.scriptUrl) { this.showToast('Renseignez une URL'); return; }
+    this.setState({ artisansSyncStatus: 'chargement', salesSyncStatus: 'chargement', planningSyncStatus: 'chargement' });
+    Promise.all([
+      fetch(this.urlWithSheet_(this.state.scriptUrl, 'artisans')).then(r => r.json()),
+      fetch(this.urlWithSheet_(this.state.scriptUrl, 'ventes')).then(r => r.json()),
+      fetch(this.urlWithSheet_(this.state.scriptUrl, 'planning')).then(r => r.json())
+    ]).then(([artisans, ventes, planning]) => {
+      localStorage.setItem('suivi-ventes-script-url', this.state.scriptUrl);
+      this.setState({ artisans, history: ventes.map(rowToSale), planning: planning.map(rowToPlanning), artisansSyncStatus: 'ok', salesSyncStatus: 'ok', planningSyncStatus: 'ok' });
+      this.showToast('Connexion réussie — ' + artisans.length + ' artisan(s), ' + ventes.length + ' vente(s), ' + planning.length + ' jour(s) de planning');
+    }).catch(() => {
+      this.setState({ artisansSyncStatus: 'erreur', salesSyncStatus: 'erreur', planningSyncStatus: 'erreur' });
+      this.showToast('Connexion échouée');
+    });
+  }
+
+  refreshAll() {
+    this.fetchArtisans();
+    this.fetchSales();
+    this.fetchPlanning();
+  }
+  componentWillUnmount() {
+    clearTimeout(this._toastTimer);
+    clearTimeout(this._pinTimer);
+    clearTimeout(this._welcomeTimer);
+    clearInterval(this._logoutInterval);
+  }
+
+  checkAutoLogout() {
+    const now = new Date();
+    const todayStr = now.toDateString();
+    if (now.getHours() >= 20 && this.state.isLoggedIn && this.state.lastAutoLogoutDate !== todayStr) {
+      this.setState({ lastAutoLogoutDate: todayStr });
+      this.logout();
+    }
+  }
+
+  pressDigit(d) {
+    if (this.state.pinInput.length >= 4) return;
+    const next = this.state.pinInput + d;
+    this.setState({ pinInput: next, pinError: false });
+    if (next.length === 4) this._pinTimer = setTimeout(() => this.attemptLogin(next), 150);
+  }
+  pressBackspace() {
+    this.setState(s => ({ pinInput: s.pinInput.slice(0, -1), pinError: false }));
+  }
+  attemptLogin(pin) {
+    const match = this.state.artisans.find(a => a.pin === pin);
+    if (match) {
+      this.setState({ isLoggedIn: true, isAdmin: false, loggedInArtisan: match, pinInput: '', pinError: false, welcomeMsg: 'Bienvenue ' + match.prenom, activeTab: 'caisse' });
+      this._welcomeTimer = setTimeout(() => this.setState({ welcomeMsg: null }), 2500);
+    } else {
+      this.setState({ pinError: true });
+      this._pinTimer = setTimeout(() => this.setState({ pinInput: '', pinError: false }), 700);
+    }
+  }
+  logout() {
+    this.setState({ isLoggedIn: false, isAdmin: false, loggedInArtisan: null, pinInput: '', pinError: false, welcomeMsg: null, activeTab: 'caisse' });
+  }
+
+  openAdminPrompt() { this.setState({ showAdminPrompt: true, adminPassword: '', adminError: false }); }
+  closeAdminPrompt() { this.setState({ showAdminPrompt: false, adminPassword: '', adminError: false }); }
+  setAdminPassword(v) { this.setState({ adminPassword: v, adminError: false }); }
+  attemptAdminLogin() {
+    if (!this.state.scriptUrl) { this.setState({ adminError: true }); return; }
+    const token = this.state.adminPassword;
+    fetch(this.state.scriptUrl, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'admin', action: 'checkToken', app: 'ventes', adminToken: token, deviceToken: this.state.deviceToken })
+    }).then(r => r.json()).then(res => {
+      if (res && res.ok) {
+        localStorage.setItem('app-admin-token', token);
+        this.setState({ isLoggedIn: true, isAdmin: true, adminToken: token, loggedInArtisan: { prenom: 'Administrateur', nom: '' }, showAdminPrompt: false, adminPassword: '', welcomeMsg: 'Bienvenue Administrateur' });
+        this._welcomeTimer = setTimeout(() => this.setState({ welcomeMsg: null }), 2500);
+      } else {
+        this.setState({ adminError: true });
+      }
+    }).catch(() => this.setState({ adminError: true }));
+  }
+
+  setTab(id) { this.setState({ activeTab: id }); if (id === 'reglements') this.fetchReglements(); }
+  openSettings() { this.setState(s => ({ prevTab: s.activeTab, activeTab: 'settings' })); }
+  closeSettings() { this.setState(s => ({ activeTab: s.prevTab || 'caisse' })); }
+  setHistoryFilter(id) { this.setState({ historyFilter: id }); }
+
+  addLine() {
+    this.setState(s => ({ lines: [...s.lines, { id: 'l' + Date.now(), amount: '', buyer: '', payment: '' }] }));
+  }
+  removeLine(id) {
+    this.setState(s => ({ lines: s.lines.length > 1 ? s.lines.filter(l => l.id !== id) : s.lines }));
+  }
+  setLineAmount(id, v) {
+    if (!/^[0-9]*[,.]?[0-9]{0,2}$/.test(v)) return;
+    this.setState(s => ({ lines: s.lines.map(l => l.id === id ? { ...l, amount: v } : l) }));
+  }
+  setLineBuyer(id, v) {
+    this.setState(s => ({ lines: s.lines.map(l => l.id === id ? { ...l, buyer: v } : l) }));
+  }
+  setLinePayment(id, v) {
+    this.setState(s => ({ lines: s.lines.map(l => l.id === id ? { ...l, payment: v } : l) }));
+  }
+
+  showToast(msg) {
+    clearTimeout(this._toastTimer);
+    this.setState({ toastMsg: msg });
+    this._toastTimer = setTimeout(() => this.setState({ toastMsg: null }), 2200);
+  }
+
+  isLineValid(l) {
+    const amt = parseFloat(String(l.amount).replace(',', '.'));
+    return !!l.buyer.trim() && amt > 0 && !!l.payment;
+  }
+
+  registerSale() {
+    const payLabels = { especes: 'Espèces', carte: 'Carte', cheque: 'Chèque' };
+    if (!this.state.lines.every(l => this.isLineValid(l))) return;
+    const valid = this.state.lines.map(l => ({ amount: parseFloat(String(l.amount).replace(',', '.')), buyer: l.buyer.trim(), payment: payLabels[l.payment] }));
+    const now = new Date();
+    const loggedBy = this.state.loggedInArtisan ? (this.state.loggedInArtisan.prenom + ' ' + this.state.loggedInArtisan.nom) : 'Inconnu';
+    const total = valid.reduce((s, l) => s + l.amount, 0);
+    this.setState({ lines: [{ id: 'l' + Date.now(), amount: '', buyer: '', payment: '' }] });
+
+    if (this.state.scriptUrl) {
+      Promise.all(valid.map(l => this.pushToSheet({ ts: now, buyer: l.buyer, total: l.amount, payment: l.payment, loggedBy })))
+        .then(responses => { if (responses.length) this.setState({ history: responses[responses.length - 1].map(rowToSale) }); })
+        .catch(() => this.showToast("Échec d'écriture dans le Sheet"));
+    } else {
+      const entries = valid.map((l, i) => ({ id: 'h' + Date.now() + '_' + i, ts: now, buyer: l.buyer, total: l.amount, payment: l.payment, loggedBy }));
+      this.setState(s => ({ history: [...entries, ...s.history] }));
+      this.savePending_([...this.state.pendingSales, ...entries]);
+    }
+    this.showToast(valid.length + ' vente(s) enregistrée(s)' + (this.state.scriptUrl ? '' : ' — en attente de connexion') + ' — ' + eur(total));
+  }
+
+  openEditSale(h) {
+    const payIds = { 'Espèces': 'especes', 'Carte': 'carte', 'Chèque': 'cheque' };
+    this.setState({ editingSale: { id: h.id, buyer: h.buyer, amount: String(h.total).replace('.', ','), payment: payIds[h.payment] || '' } });
+  }
+  closeEditSale() { this.setState({ editingSale: null }); }
+  requestDeleteSale(h) { this.setState({ confirmDeleteSale: h }); }
+  closeConfirmDeleteSale() { this.setState({ confirmDeleteSale: null }); }
+  performDeleteSale() {
+    const h = this.state.confirmDeleteSale;
+    if (!h) return;
+    this.setState({ confirmDeleteSale: null });
+    if (this.state.scriptUrl) {
+      fetch(this.state.scriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ sheet: 'ventes', action: 'remove', id: h.id, app: 'ventes', deviceToken: this.state.deviceToken, adminToken: this.state.adminToken })
+      }).then(r => r.json()).then(rows => {
+        this.setState({ history: rows.map(rowToSale) });
+        this.showToast('Vente supprimée');
+      }).catch(() => this.showToast('Échec de la suppression'));
+    } else {
+      this.setState(s => ({ history: s.history.filter(x => x.id !== h.id) }));
+      this.savePending_(this.state.pendingSales.filter(p => p.id !== h.id));
+      this.showToast('Vente supprimée');
+    }
+  }
+  setEditSaleField(field, v) {
+    this.setState(s => ({ editingSale: { ...s.editingSale, [field]: v } }));
+  }
+  saveEditSale() {
+    const payLabels = { especes: 'Espèces', carte: 'Carte', cheque: 'Chèque' };
+    const draft = this.state.editingSale;
+    const amt = parseFloat(String(draft.amount).replace(',', '.'));
+    if (!draft.buyer || !(amt > 0) || !draft.payment) { this.showToast('Merci de compléter artisan, montant et paiement'); return; }
+    const payment = payLabels[draft.payment];
+
+    if (this.state.scriptUrl) {
+      fetch(this.state.scriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ sheet: 'ventes', action: 'update', id: draft.id, artisan: draft.buyer, montant: amt, paiement: payment, app: 'ventes', deviceToken: this.state.deviceToken, adminToken: this.state.adminToken })
+      }).then(r => r.json()).then(rows => {
+        this.setState({ history: rows.map(rowToSale), editingSale: null });
+        this.showToast('Vente modifiée');
+      }).catch(() => this.showToast('Échec de la modification'));
+    } else {
+      this.setState(s => ({
+        history: s.history.map(h => h.id === draft.id ? { ...h, buyer: draft.buyer, total: amt, payment } : h),
+        editingSale: null
+      }));
+      this.showToast('Vente modifiée');
+    }
+  }
+
+  downloadBlob_(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  historyRows_() {
+    const s = this.state;
+    const ownName = s.loggedInArtisan ? (s.loggedInArtisan.prenom + ' ' + s.loggedInArtisan.nom).trim() : '';
+    const scope = s.isAdmin ? s.exportArtisanFilter : ownName;
+    const scoped = scope ? s.history.filter(h => h.buyer === scope) : s.history;
+    return [...scoped].sort((a, b) => b.ts - a.ts);
+  }
+  exportCsv() {
+    const rows = this.historyRows_();
+    const header = ['Date', 'Heure', 'Artisan', 'Paiement', 'Montant'];
+    const lines = [header.join(';')].concat(rows.map(h => [
+      h.ts.toLocaleDateString('fr-FR'), h.ts.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      h.buyer, h.payment, h.total.toFixed(2).replace('.', ',')
+    ].join(';')));
+    this.downloadBlob_('\uFEFF' + lines.join('\r\n'), 'ventes.csv', 'text/csv;charset=utf-8;');
+    this.setState({ exportMenuOpen: false });
+    this.showToast('Export CSV téléchargé');
+  }
+  exportExcel() {
+    const rows = this.historyRows_();
+    const th = ['Date', 'Heure', 'Artisan', 'Paiement', 'Montant (€)'].map(x => `<th>${x}</th>`).join('');
+    const trs = rows.map(h => `<tr><td>${h.ts.toLocaleDateString('fr-FR')}</td><td>${h.ts.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td><td>${h.buyer}</td><td>${h.payment}</td><td>${h.total.toFixed(2).replace('.', ',')}</td></tr>`).join('');
+    const html = `<html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table></body></html>`;
+    this.downloadBlob_(html, 'ventes.xls', 'application/vnd.ms-excel');
+    this.setState({ exportMenuOpen: false });
+    this.showToast('Export Excel téléchargé');
+  }
+  exportPdf() { this.showToast('Export PDF téléchargé (simulation)'); }
+  startExportPress() {
+    this._exportLongPress = false;
+    clearTimeout(this._exportPressTimer);
+    this._exportPressTimer = setTimeout(() => {
+      this._exportLongPress = true;
+      this.setState({ exportMenuOpen: true });
+    }, 2000);
+  }
+  endExportPress() { clearTimeout(this._exportPressTimer); }
+  onExportClick() {
+    if (this._exportLongPress) { this._exportLongPress = false; return; }
+    this.exportExcel();
+  }
+  closeExportMenu() { this.setState({ exportMenuOpen: false }); }
+
+  setNewArtisanField(field, v) {
+    this.setState(s => ({ newArtisan: { ...s.newArtisan, [field]: v } }));
+  }
+  requestAddArtisan() {
+    const { prenom, nom, email, pin } = this.state.newArtisan;
+    if (!prenom.trim() || !nom.trim() || !email.trim() || !/^[0-9]{4}$/.test(pin)) { this.showToast('Merci de renseigner prénom, nom, e-mail et un PIN à 4 chiffres'); return; }
+    if (this.state.artisans.some(a => a.pin === pin)) { this.showToast('Ce code PIN est déjà utilisé par un autre artisan'); return; }
+    this.setState({ confirmNewArtisan: { prenom: prenom.trim(), nom: nom.trim(), email: email.trim(), pin } });
+  }
+  closeConfirmArtisan() { this.setState({ confirmNewArtisan: null }); }
+  addArtisan() {
+    const { prenom, nom, email, pin } = this.state.confirmNewArtisan;
+    const entry = { id: 'a' + Date.now(), prenom, nom, email, pin };
+    this.setState({ confirmNewArtisan: null });
+
+    if (this.state.scriptUrl) {
+      fetch(this.state.scriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ sheet: 'artisans', action: 'add', prenom: entry.prenom, nom: entry.nom, email: entry.email, pin: entry.pin, app: 'ventes', adminToken: this.state.adminToken, deviceToken: this.state.deviceToken })
+      }).then(r => r.json()).then(list => {
+        this.setState({ artisans: list, newArtisan: { prenom: '', nom: '', email: '', pin: '' } });
+        this.showToast('Profil ajouté — ' + entry.prenom + ' ' + entry.nom);
+      }).catch(() => this.showToast("Échec d'écriture dans le Sheet Artisans"));
+    } else {
+      this.setState(s => ({ artisans: [...s.artisans, entry], newArtisan: { prenom: '', nom: '', email: '', pin: '' } }));
+      this.showToast('Profil ajouté (non synchronisé — configurez le Sheet Artisans)');
+    }
+  }
+  removeArtisan(id) {
+    if (this.state.scriptUrl) {
+      fetch(this.state.scriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ sheet: 'artisans', action: 'remove', id, app: 'ventes', adminToken: this.state.adminToken, deviceToken: this.state.deviceToken })
+      }).then(r => r.json()).then(list => this.setState({ artisans: list })).catch(() => this.showToast('Échec de suppression'));
+    } else {
+      this.setState(s => ({ artisans: s.artisans.filter(a => a.id !== id) }));
+    }
+  }
+  togglePinAuth() {
+    this.setState(s => ({ pinAuthEnabled: !s.pinAuthEnabled }));
+  }
+  setScriptUrl(v) { this.setState({ scriptUrl: v }); }
+
+  pushToSheet(entry) {
+    return fetch(this.state.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        sheet: 'ventes',
+        action: 'add',
+        date: entry.ts.toLocaleDateString('fr-FR'),
+        heure: entry.ts.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        artisan: entry.buyer,
+        montant: entry.total,
+        paiement: entry.payment,
+        saisiPar: entry.loggedBy,
+        iso: entry.ts.toISOString(),
+        app: 'ventes',
+        deviceToken: this.state.deviceToken
+      })
+    }).then(r => r.json());
+  }
+
+  openAmountKeypad(lineId, currentValue) {
+    this.setState({ activeAmountLineId: lineId, amountBuffer: currentValue || '' });
+  }
+  pressAmountDigit(d) {
+    this.setState(s => {
+      const next = s.amountBuffer + d;
+      return /^[0-9]*,?[0-9]{0,2}$/.test(next) ? { amountBuffer: next } : s;
+    });
+  }
+  pressAmountComma() {
+    this.setState(s => (s.amountBuffer.includes(',') ? s : { amountBuffer: s.amountBuffer + ',' }));
+  }
+  pressAmountBackspace() {
+    this.setState(s => ({ amountBuffer: s.amountBuffer.slice(0, -1) }));
+  }
+  openEditAmountKeypad() {
+    this.setState({ activeAmountLineId: 'EDIT_SALE', amountBuffer: this.state.editingSale.amount || '' });
+  }
+  confirmAmount() {
+    if (this.state.activeAmountLineId === 'EDIT_SALE') {
+      this.setState(s => ({ editingSale: { ...s.editingSale, amount: s.amountBuffer }, activeAmountLineId: null, amountBuffer: '' }));
+    } else {
+      this.setLineAmount(this.state.activeAmountLineId, this.state.amountBuffer);
+      this.setState({ activeAmountLineId: null, amountBuffer: '' });
+    }
+  }
+  cancelAmountKeypad() {
+    this.setState({ activeAmountLineId: null, amountBuffer: '' });
+  }
+
+  renderVals() {
+    const s = this.state;
+
+    const allTabs = [
+      { id: 'caisse', label: 'Caisse', iconHtml: { __html: ICONS.caisse } },
+      { id: 'historique', label: 'Historique', iconHtml: { __html: ICONS.historique } },
+      { id: 'planning', label: 'Planning', iconHtml: { __html: ICONS.planning } },
+      { id: 'reglements', label: 'Règlements', iconHtml: { __html: ICONS.reglements } },
+      { id: 'export', label: 'Comptabilité', iconHtml: { __html: ICONS.export } },
+      { id: 'artisans', label: 'Artisans', iconHtml: { __html: ICONS.artisans } }
+    ];
+    const showExport = s.isAdmin || (s.pinAuthEnabled && s.isLoggedIn);
+    const navTabs = allTabs.filter(t => (t.id !== 'export' || showExport) && (t.id !== 'reglements' || s.isAdmin)).map(t => {
+      const active = t.id === s.activeTab;
+      return {
+        ...t,
+        select: () => this.setTab(t.id),
+        style: `display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;` + (active ? `background:#B5502E;` : `background:transparent;`)
+      };
+    });
+
+    const payLabels = { especes: 'Espèces', carte: 'Carte', cheque: 'Chèque' };
+    const lines = s.lines.map(l => ({
+      id: l.id, amount: l.amount, buyer: l.buyer,
+      amountLabel: l.amount || '0,00',
+      openKeypad: () => this.openAmountKeypad(l.id, l.amount),
+      onBuyerChange: (e) => this.setLineBuyer(l.id, e.target.value),
+      buyerOptions: [{ value: '', label: 'Sélectionner un artisan' }].concat(
+        s.artisans.map(a => ({ value: a.prenom + ' ' + a.nom, label: a.prenom + ' ' + a.nom }))
+      ),
+      remove: () => this.removeLine(l.id),
+      removeStyle: `width:22px;height:22px;flex:none;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;cursor:pointer;` +
+        (s.lines.length > 1 ? `color:#B0A184;` : `color:#E7DAC4;cursor:default;`),
+      paymentOptions: Object.keys(payLabels).map(id => {
+        const active = id === l.payment;
+        return {
+          id, label: payLabels[id],
+          select: () => this.setLinePayment(l.id, id),
+          style: `flex:1;text-align:center;padding:8px 0;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;` +
+            (active ? `background:#B5502E;color:#FFFCF6;` : `background:#F0E6D3;color:#6B5E48;`)
+        };
+      })
+    }));
+    const linesTotal = s.lines.reduce((sum, l) => sum + (parseFloat(String(l.amount).replace(',', '.')) || 0), 0);
+    const allLinesValid = s.lines.every(l => this.isLineValid(l));
+
+    const registerStyle = `text-align:center;padding:16px 0;border-radius:10px;font-size:15px;font-weight:800;` +
+      (allLinesValid ? `background:#2B241C;color:#F6EFE4;cursor:pointer;` : `background:#EFE6D3;color:#B0A184;cursor:not-allowed;`);
+
+    const now2 = new Date();
+    const startOfWeek = new Date(now2);
+    const dayIdx = (startOfWeek.getDay() + 6) % 7; // Monday-start
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(startOfWeek.getDate() - dayIdx);
+    const startOfMonth = new Date(now2.getFullYear(), now2.getMonth(), 1);
+
+    const isRefreshing = s.artisansSyncStatus === 'chargement' || s.salesSyncStatus === 'chargement' || s.planningSyncStatus === 'chargement';
+    const historyFilters = [
+      { id: 'tout', label: 'Tout' },
+      { id: 'semaine', label: 'Cette semaine' },
+      { id: 'mois', label: 'Mois' }
+    ].map(f => {
+      const active = f.id === s.historyFilter;
+      return {
+        ...f,
+        select: () => this.setHistoryFilter(f.id),
+        style: `padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;` +
+          (active ? `background:#2B241C;color:#F6EFE4;` : `background:#FFFCF6;color:#6B5E48;border:1px solid #E7DAC4;`)
+      };
+    });
+
+    const filteredHistory = s.history.filter(h => {
+      if (s.historyFilter === 'semaine') return h.ts >= startOfWeek;
+      if (s.historyFilter === 'mois') return h.ts >= startOfMonth;
+      return true;
+    });
+    const todayStr = new Date().toDateString();
+    const sortedHistory = [...filteredHistory].sort((a, b) => b.ts - a.ts);
+    const historyList = [];
+    let lastDayKey = null;
+    sortedHistory.forEach(h => {
+      const dayKey = h.ts.toDateString();
+      if (dayKey !== lastDayKey) {
+        lastDayKey = dayKey;
+        const isTodayGroup = dayKey === todayStr;
+        historyList.push({
+          id: 'sep-' + dayKey,
+          isSeparator: true,
+          isSaleRow: false,
+          separatorLabel: isTodayGroup ? "Aujourd'hui — " + h.ts.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : h.ts.toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+        });
+      }
+      const isToday = h.ts.toDateString() === todayStr;
+      historyList.push({
+        id: h.id,
+        isSeparator: false,
+        isSaleRow: true,
+        dateLabel: h.ts.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+        timeLabel: h.ts.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        noteLabel: h.buyer,
+        totalLabel: eur(h.total),
+        paymentLabel: h.payment + ' · saisi par ' + (h.loggedBy || 'Inconnu'),
+        canEdit: isToday && s.isAdmin,
+        openEdit: () => this.openEditSale(h),
+        canDelete: isToday && s.isAdmin,
+        requestDelete: () => this.requestDeleteSale(h)
+      });
+    });
+
+    const ownName = s.loggedInArtisan ? (s.loggedInArtisan.prenom + ' ' + s.loggedInArtisan.nom).trim() : '';
+    const exportScope = s.isAdmin ? s.exportArtisanFilter : ownName;
+    const exportHistory = exportScope ? s.history.filter(h => h.buyer === exportScope) : s.history;
+    const exportTotal = exportHistory.reduce((sum, h) => sum + h.total, 0);
+    const paymentTotals = {};
+    exportHistory.forEach(h => { paymentTotals[h.payment] = (paymentTotals[h.payment] || 0) + h.total; });
+    const byPayment = Object.keys(paymentTotals).map(label => ({
+      label, amountLabel: eur(paymentTotals[label]),
+      barStyle: `width:${Math.round((paymentTotals[label] / exportTotal) * 100)}%;height:100%;background:#B5502E;`
+    }));
+    const exportArtisanOptions = [{ value: '', label: 'Tous les artisans (total)' }].concat(
+      s.artisans.map(a => ({ value: a.prenom + ' ' + a.nom, label: a.prenom + ' ' + a.nom }))
+    );
+
+    const todayStart = new Date(now2); todayStart.setHours(0, 0, 0, 0);
+    let periodStart = null, periodEnd = null;
+    if (s.exportPeriod === 'jour') { periodStart = todayStart; }
+    else if (s.exportPeriod === 'semaine') { periodStart = startOfWeek; }
+    else if (s.exportPeriod === 'mois') { periodStart = startOfMonth; }
+    else if (s.exportPeriod === 'personnalise') {
+      periodStart = s.exportCustomStart ? new Date(s.exportCustomStart + 'T00:00:00') : null;
+      periodEnd = s.exportCustomEnd ? new Date(s.exportCustomEnd + 'T23:59:59') : null;
+    }
+    const periodHistory = s.history.filter(h => (!periodStart || h.ts >= periodStart) && (!periodEnd || h.ts <= periodEnd));
+    const artisanTotals = {};
+    periodHistory.forEach(h => { artisanTotals[h.buyer] = (artisanTotals[h.buyer] || 0) + h.total; });
+    const artisanNames = Object.keys(artisanTotals).sort((a, b) => artisanTotals[b] - artisanTotals[a]);
+    const maxArtisanTotal = Math.max(1, ...artisanNames.map(n => artisanTotals[n]));
+    const artisanBarData = artisanNames.map(name => ({
+      name, amountLabel: eur(artisanTotals[name]),
+      barStyle: `width:${Math.round((artisanTotals[name] / maxArtisanTotal) * 100)}%;height:100%;background:#B5502E;`
+    }));
+    const exportPeriodFilters = [
+      { id: 'jour', label: 'Jour' },
+      { id: 'semaine', label: 'Semaine' },
+      { id: 'mois', label: 'Mois' },
+      { id: 'personnalise', label: 'Personnalisé' }
+    ].map(f => {
+      const active = f.id === s.exportPeriod;
+      return {
+        ...f,
+        select: () => this.setState({ exportPeriod: f.id }),
+        style: `padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;` +
+          (active ? `background:#2B241C;color:#F6EFE4;` : `background:#FFFCF6;color:#6B5E48;border:1px solid #E7DAC4;`)
+      };
+    });
+
+    const findPlanningEntry = (d) => s.planning.find(p => p.ts && p.ts.toDateString() === d.toDateString());
+    const dayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    const todayForPlanning = new Date(); todayForPlanning.setHours(0, 0, 0, 0);
+    const normName = (v) => (v || '').toString().trim().toLowerCase();
+    const ownNameNorm = normName(ownName);
+    const isMeName = (name) => {
+      const a = normName(name);
+      if (!a || !ownNameNorm) return false;
+      return a === ownNameNorm || a.includes(ownNameNorm) || ownNameNorm.includes(a);
+    };
+
+    const planningEntryCell = (d, inMonth) => {
+      const entry = findPlanningEntry(d);
+      const isToday = d.toDateString() === todayForPlanning.toDateString();
+      const astreinte = entry ? entry.astreinte || '' : '';
+      const astreinteIsMe = !!astreinte && isMeName(astreinte);
+      const isClosed = !!(entry && entry.fermeture);
+      return {
+        dateNum: d.getDate(),
+        dayLabel: dayLabels[(d.getDay() + 6) % 7],
+        inMonth,
+        isToday,
+        isClosed,
+        hasEntry: !!entry,
+        astreinte,
+        astreinteIsMe,
+        renfort1: entry ? entry.renfort1 || '' : '',
+        renfort2: entry ? entry.renfort2 || '' : '',
+        cellStyle: `border:1px solid #E7DAC4;border-radius:10px;padding:10px;min-height:86px;display:flex;flex-direction:column;gap:4px;` +
+          (isClosed ? `background:#E9E4D8;opacity:.6;` : inMonth ? `background:#FFFCF6;` : `background:#F6EFE4;opacity:.5;`) +
+          (isToday ? `border-color:#B5502E;border-width:2px;` : ''),
+        astreinteMonthStyle: `font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px;display:inline-block;width:fit-content;` +
+          (astreinteIsMe ? `color:#F6EFE4;background:#B5502E;` : `color:#6B5E48;background:#F0E6D3;border:1px solid #E7DAC4;`),
+        showRoles: !isClosed,
+        rowStyle: `display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;align-items:center;border-top:1px solid #E7DAC4;` +
+          (isClosed ? `background:#E9E4D8;opacity:.65;` : astreinteIsMe ? `background:#FBF0E4;` : isToday ? `background:#FFF9EE;` : `background:transparent;`) +
+          (isToday ? `box-shadow:inset 3px 0 0 #B5502E;` : ''),
+        astreinteCellStyle: `padding:12px 14px;`,
+        astreinteTagStyle: `font-size:12px;font-weight:700;border-radius:20px;padding:4px 12px;display:inline-block;` +
+          (astreinteIsMe ? `color:#F6EFE4;background:#B5502E;` : `color:#6B5E48;background:#F0E6D3;border:1px solid #E7DAC4;`)
+      };
+    };
+
+    let planningWeekDays = [];
+    let planningMonthWeeks = [];
+    let planningPeriodLabel = '';
+    if (s.planningViewMode === 'semaine') {
+      const base = new Date(todayForPlanning);
+      const idx = (base.getDay() + 6) % 7;
+      base.setDate(base.getDate() - idx + s.planningOffset * 7);
+      planningWeekDays = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(base); d.setDate(base.getDate() + i);
+        return planningEntryCell(d, true);
+      });
+      const last = new Date(base); last.setDate(base.getDate() + 6);
+      planningPeriodLabel = base.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) + ' – ' + last.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+    } else {
+      const monthDate = new Date(todayForPlanning.getFullYear(), todayForPlanning.getMonth() + s.planningOffset, 1);
+      const firstIdx = (monthDate.getDay() + 6) % 7;
+      const gridStart = new Date(monthDate); gridStart.setDate(1 - firstIdx);
+      const weeks = [];
+      for (let w = 0; w < 6; w++) {
+        const days = [];
+        for (let d0 = 0; d0 < 7; d0++) {
+          const d = new Date(gridStart); d.setDate(gridStart.getDate() + w * 7 + d0);
+          days.push(planningEntryCell(d, d.getMonth() === monthDate.getMonth()));
+        }
+        weeks.push({ id: 'w' + w, days });
+      }
+      planningMonthWeeks = weeks;
+      planningPeriodLabel = monthNames[monthDate.getMonth()] + ' ' + monthDate.getFullYear();
+    }
+
+    const artisanList = s.artisans.map(a => ({
+      id: a.id, prenom: a.prenom, nom: a.nom, email: a.email, pin: a.pin,
+      initials: (a.prenom[0] || '').toUpperCase() + (a.nom[0] || '').toUpperCase(),
+      remove: () => this.removeArtisan(a.id)
+    }));
+
+    const pinDots = [0, 1, 2, 3].map(i => ({
+      style: `width:16px;height:16px;border-radius:50%;border:2px solid ${s.pinError ? '#B5502E' : '#8C7C63'};background:${i < s.pinInput.length ? (s.pinError ? '#B5502E' : '#2B241C') : 'transparent'};`
+    }));
+    const keypadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map(k => ({
+      label: k,
+      press: k === '⌫' ? (() => this.pressBackspace()) : k === '' ? (() => {}) : (() => this.pressDigit(k)),
+      style: `width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#2B241C;cursor:pointer;` +
+        (k === '' ? `background:transparent;border:none;cursor:default;` : `background:#FFFCF6;border:1px solid #E7DAC4;`)
+    }));
+
+    const todayStrFr = new Date().toLocaleDateString('fr-FR');
+    const todayFreq = (s.frequentation || []).find(f => f.date === todayStrFr);
+
+    return {
+      artisanName: 'Claire Moreau',
+      todayLabel: new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }),
+      navTabs,
+      isCaisse: s.activeTab === 'caisse',
+      hasVisitorCountToday: !!todayFreq,
+      visitorCountTodayLabel: todayFreq ? (todayFreq.nombre + ' personne(s) enregistrée(s)' + (todayFreq.saisiPar ? ' par ' + todayFreq.saisiPar : '')) : '',
+      visitorCountInput: s.visitorCountInput,
+      onVisitorCountChange: (e) => this.setVisitorCountInput(e.target.value),
+      submitVisitorCount: () => this.submitVisitorCount(),
+      visitorCountSubmitting: s.visitorCountSubmitting,
+      submitVisitorCountStyle: `padding:8px 16px;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:12px;white-space:nowrap;` + (s.visitorCountSubmitting ? `opacity:.55;cursor:default;` : `cursor:pointer;`),
+      isHistorique: s.activeTab === 'historique',
+      isExport: s.activeTab === 'export' && showExport,
+      isArtisans: s.activeTab === 'artisans',
+      isPlanning: s.activeTab === 'planning',
+      isSettings: s.activeTab === 'settings',
+      isReglements: s.activeTab === 'reglements' && s.isAdmin,
+      reglementsPeriodLabel: (() => {
+        const now = new Date();
+        const d = new Date(now.getFullYear(), now.getMonth() + s.reglementsOffset, 1);
+        const monthNames2 = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        return monthNames2[d.getMonth()] + ' ' + d.getFullYear();
+      })(),
+      reglementsPrev: () => this.shiftReglementsOffset(-1),
+      reglementsNext: () => this.shiftReglementsOffset(1),
+      generateReglements: () => this.generateReglements(),
+      reglementsGenerating: s.reglementsGenerating,
+      generateReglementsStyle: `align-self:flex-start;padding:10px 18px;border-radius:9px;background:#F0E6D3;color:#6B5E48;font-weight:700;font-size:13px;margin-bottom:20px;display:inline-block;` + (s.reglementsGenerating ? `opacity:.55;cursor:default;` : `cursor:pointer;`),
+      reglementsLoading: s.reglementsSyncStatus === 'chargement',
+      reglementsEmpty: s.reglementsSyncStatus === 'ok' && s.reglements.length === 0,
+      reglementsTotalVirerLabel: eur(s.reglements.reduce((sum, r) => sum + (r.statutVirement === 'Viré' ? 0 : r.netAVirer), 0)),
+      reglementsTotalCashLabel: eur(s.reglements.reduce((sum, r) => sum + (r.statutCash === 'Donné' ? 0 : r.caEspeces), 0)),
+      reglementsTotalChequeLabel: eur(s.reglements.reduce((sum, r) => sum + (r.statutCheque === 'Remis' ? 0 : r.caCheque), 0)),
+      reglementsEnAttenteLabel: String(s.reglements.filter(r => r.statutVirement !== 'Viré' || r.statutCash !== 'Donné' || r.statutCheque !== 'Remis').length),
+      reglementsTotalFraisLabel: eur(s.reglements.reduce((sum, r) => sum + r.frais, 0)),
+      reglementsRows: s.reglements.map(r => {
+        const virementDone = r.statutVirement === 'Viré';
+        const cashDone = r.statutCash === 'Donné';
+        const chequeDone = r.statutCheque === 'Remis';
+        const dates = [];
+        if (r.dateVirementReelle) dates.push('Viré le ' + r.dateVirementReelle);
+        if (r.dateRemiseCashReelle) dates.push('Cash remis le ' + r.dateRemiseCashReelle);
+        if (r.dateRemiseChequeReelle) dates.push('Chèque remis le ' + r.dateRemiseChequeReelle);
+        const virementPending = !!s.reglementsPending[r.id + ':virement'];
+        const cashPending = !!s.reglementsPending[r.id + ':cash'];
+        const chequePending = !!s.reglementsPending[r.id + ':cheque'];
+        return {
+          id: r.id, nom: r.nom,
+          contextLabel: r.nbVentes + ' vente(s) · Carte ' + eur(r.caCarte) + ' · Espèces ' + eur(r.caEspeces) + ' · Chèque ' + eur(r.caCheque),
+          fraisLabel: eur(r.frais), netLabel: eur(r.netAVirer),
+          statutVirement: r.statutVirement, statutCash: r.statutCash, statutCheque: r.statutCheque,
+          virementPending, cashPending, chequePending,
+          toggleVirement: () => this.toggleVirementStatut(r),
+          toggleCash: () => this.toggleCashStatut(r),
+          toggleCheque: () => this.toggleChequeStatut(r),
+          virementBadgeStyle: `padding:8px 14px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;` + (virementPending ? `opacity:.6;cursor:default;` : `cursor:pointer;`) + (virementDone ? `background:#5A8A5F;color:#F6EFE4;` : `background:#F0E6D3;color:#6B5E48;`),
+          cashBadgeStyle: `padding:8px 14px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;` + (cashPending ? `opacity:.6;cursor:default;` : `cursor:pointer;`) + (cashDone ? `background:#5A8A5F;color:#F6EFE4;` : `background:#F0E6D3;color:#6B5E48;`),
+          chequeBadgeStyle: `padding:8px 14px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;` + (chequePending ? `opacity:.6;cursor:default;` : `cursor:pointer;`) + (chequeDone ? `background:#5A8A5F;color:#F6EFE4;` : `background:#F0E6D3;color:#6B5E48;`),
+          datesLabel: dates.join(' · ') || ('Échéance ' + r.dateEcheance)
+        };
+      }),
+      planningViewMode: s.planningViewMode,
+      isPlanningWeek: s.planningViewMode === 'semaine',
+      isPlanningMonth: s.planningViewMode === 'mois',
+      setPlanningWeek: () => this.setPlanningViewMode('semaine'),
+      setPlanningMonth: () => this.setPlanningViewMode('mois'),
+      planningWeekModeStyle: `padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;` + (s.planningViewMode === 'semaine' ? `background:#2B241C;color:#F6EFE4;` : `background:#FFFCF6;color:#6B5E48;border:1px solid #E7DAC4;`),
+      planningMonthModeStyle: `padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;` + (s.planningViewMode === 'mois' ? `background:#2B241C;color:#F6EFE4;` : `background:#FFFCF6;color:#6B5E48;border:1px solid #E7DAC4;`),
+      planningPrev: () => this.shiftPlanningOffset(-1),
+      planningNext: () => this.shiftPlanningOffset(1),
+      planningToday: () => this.setState({ planningOffset: 0 }),
+      planningPeriodLabel,
+      planningWeekDays,
+      planningMonthWeeks,
+      planningDayLabels: dayLabels,
+      planningNoUrl: !s.scriptUrl,
+      planningStatusDotStyle: `width:8px;height:8px;border-radius:50%;flex:none;background:${s.scriptUrl ? '#5A8A5F' : '#B5502E'};`,
+      planningStatusLabel: s.scriptUrl ? 'Planning connecté' : 'Planning non connecté',
+      planningSyncLabel: s.planningSyncStatus === 'erreur' ? 'Erreur de synchronisation' : s.planningSyncStatus === 'chargement' ? 'Chargement…' : s.planningSyncStatus === 'ok' ? 'Synchronisé' : '',
+      openSettings: () => this.openSettings(),
+      closeSettings: () => this.closeSettings(),
+      artisanList,
+      artisanCountLabel: s.artisans.length + (s.artisans.length > 1 ? ' artisans enregistrés' : ' artisan enregistré'),
+      newArtisanPrenom: s.newArtisan.prenom,
+      newArtisanNom: s.newArtisan.nom,
+      newArtisanEmail: s.newArtisan.email,
+      newArtisanPin: s.newArtisan.pin,
+      onNewArtisanPrenom: (e) => this.setNewArtisanField('prenom', e.target.value),
+      onNewArtisanNom: (e) => this.setNewArtisanField('nom', e.target.value),
+      onNewArtisanEmail: (e) => this.setNewArtisanField('email', e.target.value),
+      onNewArtisanPin: (e) => { if (/^[0-9]{0,4}$/.test(e.target.value)) this.setNewArtisanField('pin', e.target.value); },
+      addArtisan: () => this.requestAddArtisan(),
+      showConfirmArtisan: !!s.confirmNewArtisan,
+      confirmArtisanPrenom: s.confirmNewArtisan ? s.confirmNewArtisan.prenom : '',
+      confirmArtisanNom: s.confirmNewArtisan ? s.confirmNewArtisan.nom : '',
+      confirmArtisanEmail: s.confirmNewArtisan ? s.confirmNewArtisan.email : '',
+      confirmArtisanPin: s.confirmNewArtisan ? s.confirmNewArtisan.pin : '',
+      closeConfirmArtisan: () => this.closeConfirmArtisan(),
+      validateAddArtisan: () => this.addArtisan(),
+      lines,
+      linesTotalLabel: eur(linesTotal),
+      addLine: () => this.addLine(),
+      registerStyle,
+      registerSale: allLinesValid ? (() => this.registerSale()) : (() => {}),
+      historyFilters,
+      historyList,
+      historyCountLabel: filteredHistory.length + ' ventes enregistrées',
+      exportTotalLabel: eur(exportTotal),
+      exportCountLabel: String(exportHistory.length),
+      exportAvgLabel: eur(exportTotal / (exportHistory.length || 1)),
+      byPayment,
+      showExportScopePicker: s.isAdmin,
+      exportArtisanOptions,
+      exportArtisanFilter: s.exportArtisanFilter,
+      onExportArtisanFilterChange: (e) => this.setState({ exportArtisanFilter: e.target.value }),
+      exportScopeLabel: s.isAdmin ? '' : (ownName ? 'Vos ventes — ' + ownName : ''),
+      exportPeriodFilters,
+      showCustomPeriod: s.exportPeriod === 'personnalise',
+      exportCustomStart: s.exportCustomStart,
+      exportCustomEnd: s.exportCustomEnd,
+      onExportCustomStart: (e) => this.setState({ exportCustomStart: e.target.value }),
+      onExportCustomEnd: (e) => this.setState({ exportCustomEnd: e.target.value }),
+      artisanBarData,
+      noArtisanBarData: artisanBarData.length === 0,
+      exportCsv: () => this.exportCsv(),
+      exportPdf: () => this.exportPdf(),
+      onExportClick: () => this.onExportClick(),
+      startExportPress: () => this.startExportPress(),
+      endExportPress: () => this.endExportPress(),
+      showExportMenu: !!s.exportMenuOpen,
+      closeExportMenu: () => this.closeExportMenu(),
+      needsAccessCode: !s.deviceToken,
+      isLoadingData: s.isLoadingData,
+      scriptUrlLoading: s.scriptUrlLoading,
+      accessCodeInput: s.accessCodeInput,
+      onAccessCodeChange: (e) => this.setState({ accessCodeInput: e.target.value, accessError: false, accessCodeInvalid: false }),
+      accessPrenomInput: s.accessPrenomInput,
+      onAccessPrenomChange: (e) => this.setState({ accessPrenomInput: e.target.value, accessError: false }),
+      accessDeviceInput: s.accessDeviceInput,
+      onAccessDeviceChange: (e) => this.setState({ accessDeviceInput: e.target.value, accessError: false }),
+      accessErrorMsg: s.accessCodeInvalid ? 'Code incorrect ou déjà utilisé' : (s.accessError && !s.scriptUrl ? 'Configuration indisponible — réessayez plus tard' : (s.accessError ? 'Code, prénom et appareil sont requis' : '')),
+      accessCodeInputStyle: `width:100%;border:1px solid ${s.accessCodeInvalid ? '#B5502E' : '#E7DAC4'};border-radius:10px;padding:11px 14px;font-size:16px;letter-spacing:.1em;color:#2B241C;font-family:'Manrope',sans-serif;margin-bottom:8px;text-align:center;` + (s.accessCodeInvalid ? 'box-shadow:0 0 0 2px rgba(181,80,46,0.25);' : ''),
+      accessChecking: s.accessChecking,
+      verifyAccessCode: () => this.verifyAccessCode(),
+      verifyAccessCodeStyle: `padding:11px 0;border-radius:9px;background:#2B241C;color:#F6EFE4;font-weight:700;font-size:13px;cursor:pointer;` + (s.accessChecking ? `opacity:.55;cursor:default;` : `cursor:pointer;`),
+      hasToast: !!s.toastMsg,
+      toastMsg: s.toastMsg || '',
+      isLoggedIn: s.isLoggedIn,
+      notLoggedIn: !s.isLoggedIn && s.pinAuthEnabled,
+      appVisible: s.isLoggedIn || !s.pinAuthEnabled,
+      pinDots,
+      keypadKeys,
+      pinErrorMsg: s.pinError ? 'Code incorrect' : '',
+      hasWelcome: !!s.welcomeMsg,
+      welcomeMsg: s.welcomeMsg || '',
+      loggedInName: s.loggedInArtisan ? (s.loggedInArtisan.prenom + ' ' + s.loggedInArtisan.nom).trim() : 'Non identifié',
+      showLogout: s.isLoggedIn,
+      showAdminEntry: !s.isAdmin,
+      logout: () => this.logout(),
+      isAdmin: s.isAdmin,
+      pinAuthEnabled: s.pinAuthEnabled,
+      togglePinAuth: () => this.togglePinAuth(),
+      pinToggleStyle: `width:46px;height:26px;border-radius:13px;padding:3px;cursor:pointer;transition:background .15s;` + (s.pinAuthEnabled ? `background:#B5502E;` : `background:#453B2E;`),
+      pinToggleKnobStyle: `width:20px;height:20px;border-radius:50%;background:#F6EFE4;transition:transform .15s;` + (s.pinAuthEnabled ? `transform:translateX(20px);` : `transform:translateX(0);`),
+      showAmountKeypad: !!s.activeAmountLineId,
+      amountBufferLabel: (s.amountBuffer || '0,00') + ' €',
+      amountKeypadKeys: ['1', '2', '3', '4', '5', '6', '7', '8', '9', ',', '0', '⌫'].map(k => ({
+        label: k,
+        press: k === '⌫' ? (() => this.pressAmountBackspace()) : k === ',' ? (() => this.pressAmountComma()) : (() => this.pressAmountDigit(k)),
+        style: `width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#2B241C;cursor:pointer;background:#FFFCF6;border:1px solid #E7DAC4;`
+      })),
+      cancelAmountKeypad: () => this.cancelAmountKeypad(),
+      confirmAmount: () => this.confirmAmount(),
+      sheetStatusDotStyle: `width:8px;height:8px;border-radius:50%;flex:none;background:${s.scriptUrl ? '#5A8A5F' : '#B5502E'};`,
+      sheetStatusLabel: (s.scriptUrl ? 'Google Sheet connectée' : 'Google Sheet non connectée') + (s.pendingSales.length ? ' · ' + s.pendingSales.length + ' vente(s) en attente' : ''),
+      scriptUrl: s.scriptUrl,
+      onScriptUrlChange: (e) => this.setScriptUrl(e.target.value),
+      testConnection: () => this.testConnection(),
+      syncLabel: (s.artisansSyncStatus === 'erreur' || s.salesSyncStatus === 'erreur') ? 'Erreur de synchronisation' : (s.artisansSyncStatus === 'chargement' || s.salesSyncStatus === 'chargement') ? 'Chargement…' : (s.artisansSyncStatus === 'ok' && s.salesSyncStatus === 'ok') ? 'Synchronisé' : '',
+      refreshAll: isRefreshing ? (() => {}) : (() => this.refreshAll()),
+      refreshBtnLabel: isRefreshing ? 'Mise à jour…' : 'Rafraîchir',
+      refreshBtnStyle: 'margin-left:auto;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;cursor:' + (isRefreshing ? 'default' : 'pointer') + ';background:#FFFCF6;color:#6B5E48;border:1px solid #E7DAC4;opacity:' + (isRefreshing ? '0.75' : '1') + ';',
+      refreshIconStyle: 'display:inline-block;line-height:1;' + (isRefreshing ? 'animation:suivi-spin 0.7s linear infinite;' : ''),
+      showEditSale: !!s.editingSale,
+      editBuyer: s.editingSale ? s.editingSale.buyer : '',
+      onEditBuyerChange: (e) => this.setEditSaleField('buyer', e.target.value),
+      editBuyerOptions: [{ value: '', label: 'Sélectionner un artisan' }].concat(s.artisans.map(a => ({ value: a.prenom + ' ' + a.nom, label: a.prenom + ' ' + a.nom }))),
+      editAmountLabel: s.editingSale ? (s.editingSale.amount || '0,00') : '0,00',
+      openEditAmountKeypad: () => this.openEditAmountKeypad(),
+      editPaymentOptions: s.editingSale ? ['especes', 'carte', 'cheque'].map(id => {
+        const labels = { especes: 'Espèces', carte: 'Carte', cheque: 'Chèque' };
+        const active = id === s.editingSale.payment;
+        return {
+          id, label: labels[id],
+          select: () => this.setEditSaleField('payment', id),
+          style: `flex:1;text-align:center;padding:8px 0;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;` + (active ? `background:#B5502E;color:#FFFCF6;` : `background:#F0E6D3;color:#6B5E48;`)
+        };
+      }) : [],
+      closeEditSale: () => this.closeEditSale(),
+      saveEditSale: () => this.saveEditSale(),
+      showConfirmDeleteSale: !!s.confirmDeleteSale,
+      confirmDeleteSaleLabel: s.confirmDeleteSale ? (s.confirmDeleteSale.buyer + ' — ' + eur(s.confirmDeleteSale.total)) : '',
+      closeConfirmDeleteSale: () => this.closeConfirmDeleteSale(),
+      performDeleteSale: () => this.performDeleteSale(),
+      showAdminPrompt: s.showAdminPrompt,
+      openAdminPrompt: () => this.openAdminPrompt(),
+      closeAdminPrompt: () => this.closeAdminPrompt(),
+      adminPassword: s.adminPassword,
+      onAdminPasswordChange: (e) => this.setAdminPassword(e.target.value),
+      attemptAdminLogin: () => this.attemptAdminLogin(),
+      adminErrorMsg: s.adminError ? 'Jeton incorrect' : ''
+    };
+  }
+}
+
+</script>
+</body>
+</html>
