@@ -227,7 +227,7 @@ function totpCodeForCounter_(secretBase32, counter) {
     counterBytes[i] = c & 0xff;
     c = Math.floor(c / 256);
   }
-  const sig = Utilities.computeHmacSha1Signature(counterBytes, keyBytes).map(b => (b < 0 ? b + 256 : b));
+  const sig = Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_1, counterBytes, keyBytes).map(b => (b < 0 ? b + 256 : b));
   const offset = sig[sig.length - 1] & 0xf;
   const binCode = ((sig[offset] & 0x7f) << 24) | ((sig[offset + 1] & 0xff) << 16) | ((sig[offset + 2] & 0xff) << 8) | (sig[offset + 3] & 0xff);
   return String(binCode % Math.pow(10, TOTP_DIGITS_)).padStart(TOTP_DIGITS_, '0');
@@ -236,7 +236,7 @@ function verifyTotp_(code, secretBase32) {
   const clean = String(code || '').replace(/\D/g, '');
   if (!clean) return false;
   const counter = Math.floor(Date.now() / 1000 / TOTP_STEP_);
-  for (let w = -1; w <= 1; w++) {
+  for (let w = -2; w <= 2; w++) {
     if (totpCodeForCounter_(secretBase32, counter + w) === clean) return true;
   }
   return false;
@@ -255,6 +255,22 @@ function printTotpSetupInfo_() {
     '&period=' + TOTP_STEP_ + '&digits=' + TOTP_DIGITS_;
   Logger.log('Secret (saisie manuelle) : ' + secret);
   Logger.log('URL à convertir en QR code : ' + uri);
+}
+/**
+ * DIAGNOSTIC : exécutez cette fonction (menu de fonctions > debugTotpNow_ >
+ * ▶ Exécuter) puis Affichage > Journaux. Comparez le code "ACTUEL" affiché
+ * ici avec celui affiché AU MÊME MOMENT sur votre téléphone : s'ils ne
+ * correspondent jamais, le secret enregistré dans l'appli d'authentification
+ * n'est pas le bon (souvent altéré par un convertisseur de QR code) —
+ * re-scannez avec le secret ci-dessous en saisie manuelle plutôt qu'en QR.
+ */
+function debugTotpNow_() {
+  const secret = getOrCreateTotpSecret_();
+  const counter = Math.floor(Date.now() / 1000 / TOTP_STEP_);
+  Logger.log('Secret stocké : ' + secret);
+  Logger.log('Code ACTUEL (30s) : ' + totpCodeForCounter_(secret, counter));
+  Logger.log('Code précédent : ' + totpCodeForCounter_(secret, counter - 1));
+  Logger.log('Code suivant : ' + totpCodeForCounter_(secret, counter + 1));
 }
 
 function checkDeviceToken_(token, app) {
@@ -325,6 +341,7 @@ function doGet(e) {
     : which === 'planning' ? readPlanning_()
     : which === 'demandes' ? readDemandes_()
     : which === 'frequentation' ? readFrequentation_()
+    : which === 'openmonths' ? getOpenMonths_()
     : readSales_();
   return ContentService.createTextOutput(JSON.stringify(payload)).setMimeType(ContentService.MimeType.JSON);
 }

@@ -74,6 +74,20 @@ function sendNewDemandeEmail_(data) {
   }
 }
 
+// Appelée depuis apps-script-planning.gs quand un artisan s'enregistre
+// directement (jour totalement vide) — validation immédiate, sans admin.
+function sendAutoRegisteredEmail_(demandeur, type, dateConcernee) {
+  const email = getArtisanEmail_(demandeur);
+  if (!email) return;
+  try {
+    MailApp.sendEmail({
+      to: email,
+      subject: 'Vous êtes enregistré(e) pour le ' + (dateConcernee || '?'),
+      body: 'Bonjour ' + demandeur + ',\n\nVous avez été enregistré(e) automatiquement pour ' + demandeTypeLabel_(type) + ' le ' + (dateConcernee || '?') + ' (personne d\'autre n\'était présent(e) ce jour-là, validation immédiate sans passer par l\'administrateur).\n\nMerci !'
+    });
+  } catch (err) {}
+}
+
 // Appelée depuis apps-script-planning.gs (applyDemandeStatus_) une fois la décision prise.
 function notifyDemandeurStatus_(demandeur, type, dateConcernee, statut) {
   const email = getArtisanEmail_(demandeur);

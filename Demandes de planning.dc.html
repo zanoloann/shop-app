@@ -145,8 +145,23 @@
           </div>
 
           <div style="flex:3 1 500px;min-width:300px;">
-            <h1 style="font-family:'Instrument Serif',serif;font-size:28px;margin:0 0 4px;font-weight:400;">Planning</h1>
-            <div style="font-size:13px;color:#8C7C63;margin-bottom:16px;">Lecture seule — pour vous aider à choisir vos dates</div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+              <div>
+                <h1 style="font-family:'Instrument Serif',serif;font-size:28px;margin:0 0 4px;font-weight:400;">Planning</h1>
+                <div style="font-size:13px;color:#8C7C63;margin-bottom:16px;">Lecture seule — pour vous aider à choisir vos dates</div>
+              </div>
+              <div onClick="{{ toggleMonthLock }}" title="{{ lockTitle }}" style="{{ lockBtnStyle }}">
+                <sc-if value="{{ monthLocked }}" hint-placeholder-val="{{ true }}">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+                </sc-if>
+                <sc-if value="{{ !monthLocked }}" hint-placeholder-val="{{ false }}">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 7.5-2"></path></svg>
+                </sc-if>
+              </div>
+            </div>
+            <sc-if value="{{ showMonthLockedBanner }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12px;color:#B5502E;background:#F7DCD3;border-radius:8px;padding:8px 12px;margin:-8px 0 16px;">Ce mois n'a pas encore été ouvert par un administrateur pour renseigner vos permanences.</div>
+            </sc-if>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;">
               <div onClick="{{ planningPrev }}" style="width:32px;height:32px;border-radius:8px;background:#FFFCF6;border:1px solid #E7DAC4;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6B5E48;font-weight:700;">‹</div>
               <div style="font-size:14px;font-weight:700;text-align:center;text-transform:capitalize;">{{ planningPeriodLabel }}</div>
@@ -412,6 +427,7 @@ class Component extends DCLogic {
     artisans: [],
     planning: [],
     demandes: [],
+    openMonths: [],
     artisansSyncStatus: '',
     planningSyncStatus: '',
     activeTab: 'demandes',
@@ -441,7 +457,7 @@ class Component extends DCLogic {
     const proceed = () => {
       if (this.state.scriptUrl && this.state.deviceToken) {
         this.setState({ isLoadingData: true });
-        Promise.all([this.fetchArtisans(), this.fetchPlanning(), this.fetchDemandes()]).then(() => this.setState({ isLoadingData: false }));
+        Promise.all([this.fetchArtisans(), this.fetchPlanning(), this.fetchDemandes(), this.fetchOpenMonths()]).then(() => this.setState({ isLoadingData: false }));
       }
     };
     if (this.state.scriptUrl) { proceed(); return; }
@@ -464,7 +480,7 @@ class Component extends DCLogic {
       if (res && res.ok) {
         localStorage.setItem('app-device-token-planning', res.deviceToken);
         this.setState({ deviceToken: res.deviceToken, accessChecking: false, accessCodeInput: '', isLoadingData: true });
-        Promise.all([this.fetchArtisans(), this.fetchPlanning(), this.fetchDemandes()]).then(() => this.setState({ isLoadingData: false }));
+        Promise.all([this.fetchArtisans(), this.fetchPlanning(), this.fetchDemandes(), this.fetchOpenMonths()]).then(() => this.setState({ isLoadingData: false }));
       } else {
         this.setState({ accessChecking: false, accessError: true, accessCodeInvalid: true });
       }
@@ -511,6 +527,23 @@ class Component extends DCLogic {
       .then(r => r.json())
       .then(list => this.setState({ demandes: Array.isArray(list) ? list : [] }))
       .catch(() => {});
+  }
+  fetchOpenMonths() {
+    if (!this.state.scriptUrl) return Promise.resolve();
+    return fetch(this.urlWithSheet_(this.state.scriptUrl, 'openmonths'))
+      .then(r => r.json())
+      .then(list => this.setState({ openMonths: Array.isArray(list) ? list : [] }))
+      .catch(() => {});
+  }
+  toggleMonthLock(monthKey, currentlyOpen) {
+    if (!this.state.isAdminMode) return;
+    fetch(this.state.scriptUrl, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ sheet: 'planning', action: 'toggleMonth', month: monthKey, open: !currentlyOpen, app: 'planning', adminToken: this.state.adminToken, deviceToken: this.state.deviceToken })
+    }).then(r => r.json()).then(list => {
+      this.setState({ openMonths: Array.isArray(list) ? list : [] });
+      this.showToast(!currentlyOpen ? 'Mois ouvert' : 'Mois verrouillé');
+    }).catch(() => this.showToast('Échec de la mise à jour du verrouillage'));
   }
   testConnection() {
     if (!this.state.scriptUrl) { this.showToast('Renseignez une URL'); return; }
@@ -663,6 +696,7 @@ class Component extends DCLogic {
       tasks.push(fetch(this.urlWithSheet_(this.state.scriptUrl, 'artisans')).then(r => r.json()).then(artisans => this.setState({ artisans })));
       tasks.push(fetch(this.urlWithSheet_(this.state.scriptUrl, 'planning')).then(r => r.json()).then(list => this.setState({ planning: Array.isArray(list) ? list.map(rowToPlanning) : [] })));
       tasks.push(fetch(this.urlWithSheet_(this.state.scriptUrl, 'demandes')).then(r => r.json()).then(demandes => this.setState({ demandes: Array.isArray(demandes) ? demandes : [] })));
+      tasks.push(fetch(this.urlWithSheet_(this.state.scriptUrl, 'openmonths')).then(r => r.json()).then(list => this.setState({ openMonths: Array.isArray(list) ? list : [] })));
     }
     Promise.all(tasks).then(() => { this.setState({ isRefreshing: false }); this.showToast('Informations à jour'); })
       .catch(() => { this.setState({ isRefreshing: false }); this.showToast('Échec du rafraîchissement'); });
@@ -797,6 +831,8 @@ class Component extends DCLogic {
       }
     });
     const monthDate = new Date(todayForPlanning.getFullYear(), todayForPlanning.getMonth() + s.planningOffset, 1);
+    const monthKey = monthDate.getFullYear() + '-' + String(monthDate.getMonth() + 1).padStart(2, '0');
+    const isMonthOpen = Array.isArray(s.openMonths) && s.openMonths.indexOf(monthKey) !== -1;
     const firstIdx = (monthDate.getDay() + 6) % 7;
     const gridStart = new Date(monthDate); gridStart.setDate(1 - firstIdx);
     const weeks = [];
@@ -818,7 +854,7 @@ class Component extends DCLogic {
           { id: 'renfort2', label: 'Renfort 2', value: renfort2 }
         ];
         const emptyTypes = entry && !isClosed ? typeDefs.filter(t => !t.value) : [];
-        const canAdd = emptyTypes.length > 0;
+        const canAdd = emptyTypes.length > 0 && isMonthOpen;
         const myRoleThisDay = !isClosed && identity ? typeDefs.find(t => t.value && isMeName(t.value, identity)) : null;
         const canLiberate = !!myRoleThisDay;
         const isEmptyDay = !!entry && !isClosed && typeDefs.every(t => !t.value);
@@ -833,6 +869,7 @@ class Component extends DCLogic {
         else { bg = '#F6EFE4'; }
         let opacity = '1';
         if (isClosed) opacity = '.6'; else if (!inMonth) opacity = '.5';
+        const hatch = (!isMonthOpen && inMonth && !isClosed) ? 'repeating-linear-gradient(135deg, rgba(43,36,28,0.10) 0px, rgba(43,36,28,0.10) 4px, transparent 4px, transparent 10px), ' : '';
         days.push({
           dateNum: d.getDate(),
           isClosed,
@@ -847,7 +884,7 @@ class Component extends DCLogic {
           }),
           canLiberate,
           openLiberate: canLiberate ? () => this.openLiberateRequest({ dateStr: entry.dateStr, dateLabel: frToDisplay(entry.dateStr), role: myRoleThisDay.id, roleLabel: myRoleThisDay.label }) : undefined,
-          cellStyle: `position:relative;border:${borderWidth} solid ${borderColor};border-radius:8px;padding:6px;min-height:52px;display:flex;flex-direction:column;gap:2px;background:${bg};opacity:${opacity};` +
+          cellStyle: `position:relative;border:${borderWidth} solid ${borderColor};border-radius:8px;padding:6px;min-height:52px;display:flex;flex-direction:column;gap:2px;background:${hatch}${bg};opacity:${opacity};` +
             (isToday ? `box-shadow:0 0 0 2px #B5502E inset;` : ''),
           astreinteTagStyle: `font-size:9px;font-weight:700;border-radius:20px;padding:1px 6px;display:inline-block;width:fit-content;` +
             (astreinteIsMe ? `color:#F6EFE4;background:#B5502E;` : `color:#6B5E48;background:#F0E6D3;`)
@@ -891,6 +928,14 @@ class Component extends DCLogic {
       planningPeriodLabel: monthNames[monthDate.getMonth()] + ' ' + monthDate.getFullYear(),
       planningDayLabels: dayLabels,
       planningMonthWeeks: weeks,
+      monthLocked: !isMonthOpen,
+      monthLockClickable: s.isAdminMode,
+      lockTitle: s.isAdminMode ? (isMonthOpen ? 'Verrouiller ce mois' : 'Ouvrir ce mois pour la saisie') : (isMonthOpen ? 'Ce mois est ouvert' : 'Ce mois n\'est pas encore ouvert par un administrateur'),
+      lockBtnStyle: `flex:none;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;` +
+        (isMonthOpen ? `color:#3F6B45;background:#E7F1E8;` : `color:#B5502E;background:#F7DCD3;`) +
+        (s.isAdminMode ? `cursor:pointer;` : `cursor:default;`),
+      toggleMonthLock: () => this.toggleMonthLock(monthKey, isMonthOpen),
+      showMonthLockedBanner: !isMonthOpen,
 
       scriptUrl: s.scriptUrl,
       onScriptUrlChange: (e) => this.setScriptUrl(e.target.value),

@@ -57,6 +57,38 @@ function planningColForRole_(role) {
   return { astreinte: 6, renfort1: 7, renfort2: 8 }[role] || 0;
 }
 
+const OPEN_MONTHS_PROP_ = 'OPEN_MONTHS';
+function getOpenMonths_() {
+  const raw = PropertiesService.getScriptProperties().getProperty(OPEN_MONTHS_PROP_);
+  try { return raw ? JSON.parse(raw) : []; } catch (e) { return []; }
+}
+function setMonthOpen_(monthKey, open) {
+  const months = getOpenMonths_();
+  const idx = months.indexOf(monthKey);
+  if (open && idx === -1) months.push(monthKey);
+  if (!open && idx !== -1) months.splice(idx, 1);
+  PropertiesService.getScriptProperties().setProperty(OPEN_MONTHS_PROP_, JSON.stringify(months));
+  return months;
+}
+
+// true si aucune astreinte/renfort n'est assigné ce jour-là (et boutique pas fermée).
+function isDayFullyEmpty_(dateStr) {
+  const sheet = sheet_('Planning');
+  if (!sheet) return false;
+  const rows = sheet.getDataRange().getValues();
+  const tz = Session.getScriptTimeZone();
+  for (let i = 1; i < rows.length; i++) {
+    const dateCell = rows[i][1];
+    const ds = dateCell instanceof Date ? Utilities.formatDate(dateCell, tz, 'dd/MM/yyyy') : String(dateCell);
+    if (ds === dateStr) {
+      const fermeture = rows[i][0];
+      if (fermeture && String(fermeture).trim() !== '') return false;
+      return !rows[i][5] && !rows[i][6] && !rows[i][7];
+    }
+  }
+  return false;
+}
+
 // Synthèse texte du planning pour une date donnée (dd/MM/yyyy) — utilisée dans l'e-mail de notification.
 function buildDaySummary_(dateStr) {
   const sheet = sheet_('Planning');
@@ -168,11 +200,23 @@ function doPostPlanningOrDemandes_(data, which) {
     setPlanningRole_(data.date, data.role, data.value);
     return ContentService.createTextOutput(JSON.stringify(readPlanning_())).setMimeType(ContentService.MimeType.JSON);
   }
+  if (which === 'planning' && data.action === 'toggleMonth') {
+    if (!checkAdminToken_(data.adminToken)) return adminRejected_();
+    const months = setMonthOpen_(data.month, !!data.open);
+    return ContentService.createTextOutput(JSON.stringify(months)).setMimeType(ContentService.MimeType.JSON);
+  }
   const sheet = demandesSheet_();
   if (data.action === 'add') {
     const id = Utilities.getUuid();
-    sheet.appendRow([id, data.type, data.demandeur, data.dateConcernee || '', data.commentaire || '', 'En attente', new Date().toISOString(), '', '']);
-    notifyNewDemande_(id, data.type, data.demandeur, data.dateConcernee, data.commentaire);
+    const isLiberation = String(data.type || '').startsWith('liberation_');
+    if (!isLiberation && isDayFullyEmpty_(data.dateConcernee)) {
+      sheet.appendRow([id, data.type, data.demandeur, data.dateConcernee || '', data.commentaire || '', 'Validée', new Date().toISOString(), 'Auto (jour libre)', new Date().toISOString()]);
+      setPlanningRole_(data.dateConcernee, data.type, data.demandeur);
+      sendAutoRegisteredEmail_(data.demandeur, data.type, data.dateConcernee);
+    } else {
+      sheet.appendRow([id, data.type, data.demandeur, data.dateConcernee || '', data.commentaire || '', 'En attente', new Date().toISOString(), '', '']);
+      notifyNewDemande_(id, data.type, data.demandeur, data.dateConcernee, data.commentaire);
+    }
   } else if (data.action === 'status') {
     if (!checkAdminToken_(data.adminToken)) return adminRejected_();
     return ContentService.createTextOutput(JSON.stringify(applyDemandeStatus_(data.id, data.statut, data.traitePar))).setMimeType(ContentService.MimeType.JSON);
