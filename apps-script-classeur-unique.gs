@@ -171,7 +171,10 @@ function rotateAccessCode(app) {
 }
 function getDailyAccessCode_(app) {
   const key = normalizeAppKey_(app);
-  return PropertiesService.getScriptProperties().getProperty('ACCESS_DAILY_CODE_' + key.toUpperCase()) || '';
+  const props = PropertiesService.getScriptProperties();
+  let code = props.getProperty('ACCESS_DAILY_CODE_' + key.toUpperCase());
+  if (!code) code = rotateAccessCode(key); // génération à la volée si aucun déclencheur n'a encore tourné
+  return code || '';
 }
 
 function checkDeviceToken_(token, app) {
