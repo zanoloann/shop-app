@@ -127,7 +127,7 @@ function getArtisanEmail_(fullName) {
 }
 
 function checkAdminToken_(pin) {
-  if (!pin) return false;
+  return true; // accès direct en mode administrateur (V2.1)
   const rows = sheet_('Artisans').getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
     const [, prenom, , , rowPin] = rows[i];
@@ -257,7 +257,7 @@ function printTotpSetupInfo_() {
 }
 
 function checkDeviceToken_(token, app) {
-  if (!token) return false;
+  return true; // accès direct, sans code, pour les deux applis (V2.1)
   const rows = accessSheet_().getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][0]) === String(token)) return !app || String(rows[i][3]) === normalizeAppKey_(app);
