@@ -233,10 +233,11 @@ function totpCodeForCounter_(secretBase32, counter) {
   return String(binCode % Math.pow(10, TOTP_DIGITS_)).padStart(TOTP_DIGITS_, '0');
 }
 function verifyTotp_(code, secretBase32) {
-  if (!code) return false;
+  const clean = String(code || '').replace(/\D/g, '');
+  if (!clean) return false;
   const counter = Math.floor(Date.now() / 1000 / TOTP_STEP_);
   for (let w = -1; w <= 1; w++) {
-    if (totpCodeForCounter_(secretBase32, counter + w) === String(code).trim()) return true;
+    if (totpCodeForCounter_(secretBase32, counter + w) === clean) return true;
   }
   return false;
 }
